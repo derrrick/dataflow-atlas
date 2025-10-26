@@ -1,0 +1,222 @@
+[
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Wildfire Activity",
+    "sources":"NASA FIRMS (MODIS, VIIRS)",
+    "source_links":"https:\/\/firms.modaps.eosdis.nasa.gov\/",
+    "access_api":"REST, GeoJSON, WMS\/WMTS",
+    "coverage":"Global",
+    "update_frequency":"15 min \u2013 3 hr",
+    "notes":"Near-real-time hotspots; ideal for live overlays"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Flood Extent & Rainfall",
+    "sources":"NOAA (US), NASA GPM, Copernicus EMS",
+    "source_links":"https:\/\/www.nws.noaa.gov\/ | https:\/\/gpm.nasa.gov\/ | https:\/\/emergency.copernicus.eu\/",
+    "access_api":"Mixed REST, raster tiles, OPeNDAP",
+    "coverage":"Regional\/Global",
+    "update_frequency":"Hourly\u2013Daily",
+    "notes":"GPM for rainfall rates; Copernicus events for flood extent"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Drought Index \/ Soil Moisture",
+    "sources":"US Drought Monitor, NASA SMAP",
+    "source_links":"https:\/\/droughtmonitor.unl.edu\/ | https:\/\/smap.jpl.nasa.gov\/",
+    "access_api":"CSV\/GeoTIFF\/NetCDF (FTP\/HTTP)",
+    "coverage":"US (USDM), Global (SMAP)",
+    "update_frequency":"Weekly",
+    "notes":"Requires preprocessing for tile serving"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Air Quality \/ PM2.5",
+    "sources":"OpenAQ, WAQI, EPA AirNow",
+    "source_links":"https:\/\/openaq.org\/ | https:\/\/aqicn.org\/api\/ | https:\/\/www.airnow.gov\/",
+    "access_api":"REST JSON",
+    "coverage":"Global (station-based)",
+    "update_frequency":"1\u20132 hr",
+    "notes":"Station network varies by region"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Ocean Temperature Anomalies",
+    "sources":"NOAA Coral Reef Watch, Copernicus Marine",
+    "source_links":"https:\/\/coralreefwatch.noaa.gov\/ | https:\/\/marine.copernicus.eu\/",
+    "access_api":"NetCDF, OPeNDAP",
+    "coverage":"Global",
+    "update_frequency":"6 hr \u2013 Daily",
+    "notes":"Best displayed as raster tiles"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Earthquakes \/ Seismic",
+    "sources":"USGS, EMSC, IRIS",
+    "source_links":"https:\/\/earthquake.usgs.gov\/ | https:\/\/www.emsc-csem.org\/ | https:\/\/service.iris.edu\/",
+    "access_api":"GeoJSON\/REST",
+    "coverage":"Global",
+    "update_frequency":"<1 min latency",
+    "notes":"Mature, standardized feeds"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Volcanic Activity",
+    "sources":"Smithsonian GVP, USGS",
+    "source_links":"https:\/\/volcano.si.edu\/ | https:\/\/www.usgs.gov\/programs\/VHP",
+    "access_api":"CSV\/XML",
+    "coverage":"Global",
+    "update_frequency":"Daily",
+    "notes":"Event\/alert driven; lower frequency"
+  },
+  {
+    "category":"Environmental\/Natural",
+    "layer":"Severe Weather \/ Storm Tracks",
+    "sources":"NOAA NWS, NASA GIBS",
+    "source_links":"https:\/\/www.weather.gov\/ | https:\/\/gibs.earthdata.nasa.gov\/",
+    "access_api":"CAP\/GeoJSON, WMTS",
+    "coverage":"Regional\/Global",
+    "update_frequency":"Hourly",
+    "notes":"CAP alerts integrate cleanly"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Power Grid Topology",
+    "sources":"EIA, Open Infrastructure Map, State GIS",
+    "source_links":"https:\/\/www.eia.gov\/ | https:\/\/openinframap.org\/ | https:\/\/gis.data.ca.gov\/",
+    "access_api":"Shapefiles, WFS\/WMS",
+    "coverage":"US\/EU",
+    "update_frequency":"Infrequent",
+    "notes":"Static topology; good base context"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Power Outages",
+    "sources":"PowerOutage.us, EIA",
+    "source_links":"https:\/\/poweroutage.us\/ | https:\/\/www.eia.gov\/opendata\/",
+    "access_api":"JSON\/REST",
+    "coverage":"US",
+    "update_frequency":"10\u201315 min",
+    "notes":"Region-level granularity; coverage varies by utility"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Internet Outages",
+    "sources":"IODA (CAIDA), NetBlocks",
+    "source_links":"https:\/\/ioda.caida.org\/ | https:\/\/netblocks.org\/",
+    "access_api":"REST\/JSON",
+    "coverage":"Global",
+    "update_frequency":"5\u201315 min",
+    "notes":"Strong open telemetry via BGP\/DNS\/active probing"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Cellular Outages",
+    "sources":"Cloudflare Radar, Ookla (proprietary)",
+    "source_links":"https:\/\/radar.cloudflare.com\/ | https:\/\/www.ookla.com\/",
+    "access_api":"Limited public",
+    "coverage":"Global",
+    "update_frequency":"15\u201360 min",
+    "notes":"Use indirect network signals when direct data unavailable"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Transportation Networks",
+    "sources":"OpenStreetMap, OpenRailwayMap, AIS (Marine)",
+    "source_links":"https:\/\/www.openstreetmap.org\/ | https:\/\/www.openrailwaymap.org\/ | https:\/\/www.marinetraffic.com\/",
+    "access_api":"APIs\/Overpass, tiles",
+    "coverage":"Global",
+    "update_frequency":"Static\u2013Live",
+    "notes":"Combine OSM topology with live feeds (AIS, ADS-B)"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Air & Port Disruptions",
+    "sources":"OpenSky Network, Port Authorities",
+    "source_links":"https:\/\/openskynetwork.github.io\/ | https:\/\/www.portoflosangeles.org\/",
+    "access_api":"REST\/Streaming APIs",
+    "coverage":"Global\/Regional",
+    "update_frequency":"Live\u2013Hourly",
+    "notes":"OpenSky free tier is solid for flights"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Water\/Wastewater Systems",
+    "sources":"USGS NWIS, Local GIS",
+    "source_links":"https:\/\/waterdata.usgs.gov\/nwis | https:\/\/www.opengeospatial.org\/",
+    "access_api":"REST\/WFS",
+    "coverage":"Regional",
+    "update_frequency":"Daily",
+    "notes":"Coverage fragmented by locality"
+  },
+  {
+    "category":"Infrastructure\/Human",
+    "layer":"Population Density \/ Evacuation",
+    "sources":"NASA SEDAC, UN WPP, OSM",
+    "source_links":"https:\/\/sedac.ciesin.columbia.edu\/ | https:\/\/population.un.org\/wpp\/ | https:\/\/www.openstreetmap.org\/",
+    "access_api":"Raster\/CSV\/APIs",
+    "coverage":"Global",
+    "update_frequency":"Annual",
+    "notes":"Good for exposure modeling and cartographic masks"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Latency \/ Internet Performance",
+    "sources":"RIPE Atlas, M-Lab, Cloudflare Radar",
+    "source_links":"https:\/\/atlas.ripe.net\/ | https:\/\/www.measurementlab.net\/ | https:\/\/radar.cloudflare.com\/",
+    "access_api":"REST\/BigQuery\/JSON",
+    "coverage":"Global",
+    "update_frequency":"5\u201310 min",
+    "notes":"High-fidelity probes and aggregated metrics"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Supply Chain Congestion",
+    "sources":"UNCTAD, AIS (Marine), Port Authorities",
+    "source_links":"https:\/\/unctad.org\/ | https:\/\/www.marinetraffic.com\/ | https:\/\/www.portoflongbeach.com\/",
+    "access_api":"Partial APIs",
+    "coverage":"Global ports",
+    "update_frequency":"Hourly\u2013Daily",
+    "notes":"Often requires commercial feeds for completeness"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Satellite Signal Interruptions (GNSS)",
+    "sources":"NASA CDDIS, Space-Track",
+    "source_links":"https:\/\/cddis.nasa.gov\/ | https:\/\/www.space-track.org\/",
+    "access_api":"CSV\/FTP\/REST",
+    "coverage":"Global",
+    "update_frequency":"Hourly",
+    "notes":"Parsing\/derivation needed to surface as events"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Temperature\/Seismic Stress Differentials",
+    "sources":"USGS, NOAA, Copernicus",
+    "source_links":"https:\/\/www.usgs.gov\/ | https:\/\/www.noaa.gov\/ | https:\/\/www.copernicus.eu\/",
+    "access_api":"Raster\/NetCDF",
+    "coverage":"Global",
+    "update_frequency":"Hourly\u2013Daily",
+    "notes":"Computed layers; pre-tile for performance"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Social Media Signal Density",
+    "sources":"Reddit API, X\/Twitter API v2",
+    "source_links":"https:\/\/www.reddit.com\/dev\/api\/ | https:\/\/developer.x.com\/en\/docs\/twitter-api",
+    "access_api":"REST (rate-limited)",
+    "coverage":"Global",
+    "update_frequency":"Real time",
+    "notes":"Ethical use and rate limits apply"
+  },
+  {
+    "category":"Systemic\/Derived",
+    "layer":"Insurance\/Risk Indices",
+    "sources":"World Bank, Swiss Re Sigma",
+    "source_links":"https:\/\/data.worldbank.org\/ | https:\/\/www.swissre.com\/institute\/research\/sigma-research.html",
+    "access_api":"CSV\/Reports",
+    "coverage":"Global",
+    "update_frequency":"Quarterly\u2013Annual",
+    "notes":"Historical exposure; good for baseline risk"
+  }
+]
