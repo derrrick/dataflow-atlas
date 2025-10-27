@@ -34,6 +34,11 @@ CREATE POLICY "Allow public read access"
   TO public
   USING (true);
 
+CREATE POLICY "Allow service role insert"
+  ON unified_events FOR INSERT
+  TO service_role
+  WITH CHECK (true);
+
 CREATE POLICY "Allow authenticated insert"
   ON unified_events FOR INSERT
   TO authenticated

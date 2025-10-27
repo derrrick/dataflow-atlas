@@ -28,6 +28,22 @@ interface AirNowObservation {
 }
 
 /**
+ * Major US cities to query for air quality
+ */
+const US_CITIES = [
+  { lat: 40.7128, lon: -74.0060, name: 'New York' },
+  { lat: 34.0522, lon: -118.2437, name: 'Los Angeles' },
+  { lat: 41.8781, lon: -87.6298, name: 'Chicago' },
+  { lat: 29.7604, lon: -95.3698, name: 'Houston' },
+  { lat: 33.4484, lon: -112.0740, name: 'Phoenix' },
+  { lat: 39.7392, lon: -104.9903, name: 'Denver' },
+  { lat: 47.6062, lon: -122.3321, name: 'Seattle' },
+  { lat: 37.7749, lon: -122.4194, name: 'San Francisco' },
+  { lat: 25.7617, lon: -80.1918, name: 'Miami' },
+  { lat: 42.3601, lon: -71.0589, name: 'Boston' },
+]
+
+/**
  * Fetch current air quality observations from AirNow
  * @param apiKey - AirNow API key
  */
@@ -37,23 +53,35 @@ export async function fetchAirNowData(apiKey: string): Promise<UnifiedEvent[]> {
     return []
   }
 
-  // Current observations endpoint - covers entire US
-  const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=39.0&longitude=-95.0&distance=5000&API_KEY=${apiKey}`
+  const allObservations: AirNowObservation[] = []
 
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: 3600 } // Cache for 1 hour
-    })
+  // Query multiple cities in parallel for better US coverage
+  const promises = US_CITIES.map(async city => {
+    const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${city.lat}&longitude=${city.lon}&distance=100&API_KEY=${apiKey}`
 
-    if (!response.ok) {
-      throw new Error(`AirNow API error: ${response.status}`)
+    try {
+      const response = await fetch(url, {
+        next: { revalidate: 3600 } // Cache for 1 hour
+      })
+
+      if (!response.ok) {
+        console.warn(`AirNow API error for ${city.name}: ${response.status}`)
+        return []
+      }
+
+      return await response.json() as AirNowObservation[]
+    } catch (error) {
+      console.error(`Error fetching air quality for ${city.name}:`, error)
+      return []
     }
+  })
 
-    const observations: AirNowObservation[] = await response.json()
+  const results = await Promise.all(promises)
+  results.forEach(obs => allObservations.push(...obs))
 
-    // Group by location and keep highest AQI per location
-    const locationMap = new Map<string, AirNowObservation>()
-    observations.forEach(obs => {
+  // Group by location and keep highest AQI per location
+  const locationMap = new Map<string, AirNowObservation>()
+  allObservations.forEach(obs => {
       const key = `${obs.Latitude.toFixed(2)}_${obs.Longitude.toFixed(2)}`
       const existing = locationMap.get(key)
       if (!existing || obs.AQI > existing.AQI) {

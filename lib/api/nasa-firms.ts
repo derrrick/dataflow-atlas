@@ -50,7 +50,7 @@ export async function fetchNASAFires(
 
   try {
     const response = await fetch(url, {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      cache: 'no-store' // Disable cache - response can be >2MB for multi-day queries
     })
 
     if (!response.ok) {
