@@ -15,6 +15,7 @@ export async function fetchSevereWeather(): Promise<DataServiceResponse<SevereWe
           event: event.metadata?.event || 'Weather Alert',
           severity: event.metadata?.severity || 'Unknown',
           urgency: event.metadata?.urgency || 'Unknown',
+          certainty: event.metadata?.certainty,
           headline: event.metadata?.headline || event.metadata?.event || 'Weather Alert',
           location: event.metadata?.areaDesc || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
           time: formatRelativeTime(event.timestamp),

@@ -81,6 +81,7 @@ export interface SevereWeather {
   event: string // e.g., "Tornado Warning", "Hurricane Watch"
   severity: 'Extreme' | 'Severe' | 'Moderate' | 'Minor' | 'Unknown'
   urgency: 'Immediate' | 'Expected' | 'Future' | 'Past' | 'Unknown'
+  certainty?: 'Observed' | 'Likely' | 'Possible' | 'Unlikely' | 'Unknown'
   headline: string
   location: string
   time: string

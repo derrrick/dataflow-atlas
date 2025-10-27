@@ -819,6 +819,8 @@ export default function GlobeMapLibre() {
               severity: props?.severity,
               urgency: props?.urgency,
               headline: props?.headline,
+              certainty: props?.certainty,
+              expires: props?.expires,
               location: props?.location,
               time: props?.time
             }
@@ -1287,7 +1289,9 @@ export default function GlobeMapLibre() {
         event: weather.event,
         severity: weather.severity,
         urgency: weather.urgency,
+        certainty: weather.certainty,
         headline: weather.headline,
+        expires: weather.expires,
         location: weather.location,
         time: weather.time
       }

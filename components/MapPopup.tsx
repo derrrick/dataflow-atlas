@@ -17,6 +17,63 @@ interface MapPopupProps {
     event?: string
     urgency?: string
     headline?: string
+    certainty?: string
+    expires?: string
+  }
+}
+
+// Helper functions for severe weather
+function getEventCategory(event: string): string {
+  const lower = event.toLowerCase()
+  if (lower.includes('tornado')) return 'Tornado'
+  if (lower.includes('hurricane') || lower.includes('typhoon')) return 'Hurricane'
+  if (lower.includes('flood')) return 'Flood'
+  if (lower.includes('fire')) return 'Fire'
+  if (lower.includes('snow') || lower.includes('blizzard')) return 'Winter Storm'
+  if (lower.includes('thunderstorm')) return 'Severe T-Storm'
+  if (lower.includes('heat')) return 'Heat'
+  if (lower.includes('wind')) return 'High Wind'
+  return event.split(' ')[0] // First word
+}
+
+function getEventBadgeColor(event: string): string {
+  const lower = event.toLowerCase()
+  if (lower.includes('tornado')) return '#8B0000'
+  if (lower.includes('hurricane') || lower.includes('typhoon')) return '#800080'
+  if (lower.includes('flood')) return '#4169E1'
+  if (lower.includes('fire')) return '#FF4500'
+  if (lower.includes('snow') || lower.includes('blizzard')) return '#4682B4'
+  if (lower.includes('heat')) return '#FF6347'
+  if (lower.includes('wind')) return '#708090'
+  return '#9333EA'
+}
+
+function getSeverityColor(severity: string): string {
+  switch (severity) {
+    case 'Extreme': return '#8B0000'
+    case 'Severe': return '#DC143C'
+    case 'Moderate': return '#FF8C42'
+    case 'Minor': return '#FFD93D'
+    default: return '#8F9BB0'
+  }
+}
+
+function formatExpiration(expires: string): string {
+  try {
+    const expireDate = new Date(expires)
+    const now = new Date()
+    const diffMs = expireDate.getTime() - now.getTime()
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    if (diffMs < 0) return 'Expired'
+    if (diffHours === 0) return `${diffMins}m remaining`
+    if (diffHours < 24) return `${diffHours}h ${diffMins}m remaining`
+
+    const diffDays = Math.floor(diffHours / 24)
+    return `${diffDays}d ${diffHours % 24}h remaining`
+  } catch {
+    return expires
   }
 }
 
@@ -157,28 +214,38 @@ export default function MapPopup({ type, data }: MapPopupProps) {
       ` : ''}
 
       ${type === 'severeWeather' ? `
-        ${data.event ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Event</span>
-            <div style="font-size: 16px; font-weight: 600; color: #9333EA; font-family: Geist Mono, monospace;">${data.event}</div>
-          </div>
-        ` : ''}
-        ${data.severity ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Severity</span>
-            <div style="font-size: 14px; color: #9333EA; font-weight: 600; font-family: Geist Mono, monospace;">${data.severity}</div>
-          </div>
-        ` : ''}
-        ${data.urgency ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Urgency</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.urgency}</div>
-          </div>
-        ` : ''}
         ${data.headline ? `
+          <div style="margin-bottom: 12px; padding: 12px; background-color: #0A0F16; border-left: 3px solid #9333EA; border-radius: 4px;">
+            <div style="font-size: 13px; color: #FFFFFF; font-family: Geist Mono, monospace; line-height: 1.5; font-weight: 500;">${data.headline}</div>
+          </div>
+        ` : ''}
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          ${data.event ? `
+            <div style="padding: 4px 10px; background-color: ${getEventBadgeColor(data.event)}; border-radius: 4px; font-size: 11px; font-weight: 600; color: #FFFFFF; font-family: Geist Mono, monospace; text-transform: uppercase; letter-spacing: 0.5px;">
+              ${getEventCategory(data.event)}
+            </div>
+          ` : ''}
+          ${data.severity && data.severity !== 'Unknown' ? `
+            <div style="padding: 4px 10px; background-color: ${getSeverityColor(data.severity)}; border-radius: 4px; font-size: 11px; font-weight: 600; color: #FFFFFF; font-family: Geist Mono, monospace;">
+              ${data.severity}
+            </div>
+          ` : ''}
+          ${data.urgency && data.urgency !== 'Unknown' ? `
+            <div style="padding: 4px 10px; background-color: #2A3441; border: 1px solid #3D4958; border-radius: 4px; font-size: 11px; font-weight: 500; color: #C6CFDA; font-family: Geist Mono, monospace;">
+              ${data.urgency === 'Immediate' ? '🚨 ' : ''}${data.urgency}
+            </div>
+          ` : ''}
+        </div>
+        ${data.certainty ? `
           <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Alert</span>
-            <div style="font-size: 12px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.4;">${data.headline}</div>
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Certainty</span>
+            <div style="font-size: 13px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.certainty}</div>
+          </div>
+        ` : ''}
+        ${data.expires ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Expires</span>
+            <div style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">${formatExpiration(data.expires)}</div>
           </div>
         ` : ''}
       ` : ''}
