@@ -54,7 +54,7 @@ export default function GlobeMapLibre() {
           id: 'background',
           type: 'background',
           paint: {
-            'background-color': '#141821'
+            'background-color': 'transparent'
           }
         },
         {
