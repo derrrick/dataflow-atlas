@@ -220,18 +220,21 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
         {/* Results Count */}
         {showFilters && (
           <div style={{
-            padding: '16px 24px',
+            padding: '24px 32px',
             borderBottom: '1px solid #242C3A',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#080D12'
           }}>
             <span style={{
               fontSize: '11px',
-              color: '#8F9BB0',
-              fontFamily: 'Geist Mono, monospace'
+              color: '#5E6A81',
+              fontFamily: 'Geist Mono, monospace',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
             }}>
-              {filteredCharts.length} of {chartRegistry.length} charts
+              Showing {filteredCharts.length} / {chartRegistry.length}
             </span>
           </div>
         )}
@@ -247,13 +250,25 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
           {filteredCharts.length === 0 ? (
             <div style={{
               gridColumn: '1 / -1',
-              padding: '60px 24px',
-              textAlign: 'center',
-              color: '#5E6A81',
-              fontSize: '12px',
-              fontFamily: 'Geist Mono, monospace'
+              padding: '96px 32px',
+              textAlign: 'center'
             }}>
-              No charts match the selected filters
+              <div style={{
+                fontSize: '48px',
+                color: '#242C3A',
+                marginBottom: '16px'
+              }}>
+                ∅
+              </div>
+              <div style={{
+                fontSize: '11px',
+                color: '#5E6A81',
+                fontFamily: 'Geist Mono, monospace',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase'
+              }}>
+                No charts match filters
+              </div>
             </div>
           ) : (
             filteredCharts.slice(0, chartsToShow).map((chart) => {
@@ -273,41 +288,44 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
             onMouseEnter={() => setHoveredChartId(chart.id)}
             onMouseLeave={() => setHoveredChartId(null)}
             style={{
-              backgroundColor: isHovered ? '#141821' : '#0A0F16',
+              backgroundColor: '#0A0F16',
               border: '1px solid #242C3A',
+              borderLeft: isHovered ? '2px solid #39D0FF' : '1px solid #242C3A',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
               height: `${chartHeight}px`,
               gridColumn: `span ${gridColumnSpan}`,
               gridRow: `span ${gridRowSpan}`,
-              transition: 'background-color 200ms ease',
-              cursor: 'pointer',
-              boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.5)' : 'none'
+              transition: 'border-left 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+              cursor: 'pointer'
             }}
           >
             {/* Header */}
             <div style={{
-              padding: '12px 16px',
+              padding: '16px',
               borderBottom: '1px solid #242C3A',
+              backgroundColor: '#080D12',
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: 'column',
               gap: '8px'
             }}>
               <span style={{
-                fontFamily: 'monospace',
+                fontFamily: 'Geist Mono, monospace',
                 fontSize: '10px',
-                color: '#5E6A81',
-                fontWeight: 500
+                color: '#39D0FF',
+                fontWeight: 600,
+                letterSpacing: '0.5px'
               }}>
                 {chart.number}
               </span>
               <h3 style={{
-                fontSize: '13px',
-                color: '#C6CFDA',
-                fontWeight: 300,
+                fontSize: '14px',
+                color: '#FFFFFF',
+                fontWeight: 400,
+                fontFamily: 'Albert Sans, sans-serif',
                 margin: 0,
-                flex: 1
+                lineHeight: '1.3'
               }}>
                 {chart.name}
               </h3>
@@ -336,8 +354,9 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
 
             {/* Footer */}
             <div style={{
-              padding: '8px 16px',
+              padding: '12px 16px',
               borderTop: '1px solid #242C3A',
+              backgroundColor: '#080D12',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
@@ -346,16 +365,19 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
                 fontSize: '10px',
                 color: '#5E6A81',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                letterSpacing: '0.5px',
+                fontFamily: 'Geist Mono, monospace',
+                fontWeight: 600
               }}>
                 {chart.category}
               </span>
               <span style={{
-                fontSize: '9px',
-                color: '#3A4559',
-                fontFamily: 'monospace'
+                fontSize: '10px',
+                color: '#5E6A81',
+                fontFamily: 'Geist Mono, monospace',
+                letterSpacing: '0.5px'
               }}>
-                Phase {chart.phase}
+                P{chart.phase}
               </span>
             </div>
           </div>
@@ -366,31 +388,36 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
         {/* Load More Button */}
         {chartsToShow < filteredCharts.length && (
           <div style={{
-            padding: '32px',
-            textAlign: 'center'
+            padding: '48px 32px',
+            display: 'flex',
+            justifyContent: 'center',
+            borderTop: '1px solid #242C3A',
+            backgroundColor: '#080D12'
           }}>
             <button
               onClick={() => setChartsToShow(prev => prev + 9)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#39D0FF15'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)'
+                e.currentTarget.style.borderColor = '#39D0FF'
+                e.currentTarget.style.color = '#FFFFFF'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.borderColor = '#242C3A'
+                e.currentTarget.style.color = '#8F9BB0'
               }}
               style={{
-                padding: '12px 24px',
-                fontSize: '13px',
-                fontWeight: 400,
-                fontFamily: 'Albert Sans, sans-serif',
-                color: '#FFFFFF',
+                padding: '16px 48px',
+                fontSize: '11px',
+                fontWeight: 600,
+                fontFamily: 'Geist Mono, monospace',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
+                color: '#8F9BB0',
                 backgroundColor: 'transparent',
                 border: '1px solid #242C3A',
                 cursor: 'pointer',
                 transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)'
               }}>
-              Load More Charts ({filteredCharts.length - chartsToShow} remaining)
+              Load {filteredCharts.length - chartsToShow} More
             </button>
           </div>
         )}

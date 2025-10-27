@@ -102,8 +102,9 @@ export default function LayerControls() {
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      backgroundColor: '#141821',
+      backgroundColor: 'rgba(10, 15, 22, 0.5)',
       border: '1px solid #242C3A',
+      borderRadius: '100px',
       padding: '12px 16px',
       position: 'relative',
       zIndex: 100
@@ -124,19 +125,22 @@ export default function LayerControls() {
             <button
               onClick={() => toggleCategory(category.id)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.border = `1px solid ${category.color}`
+                e.currentTarget.style.borderColor = '#39D0FF'
+                e.currentTarget.style.backgroundColor = activeCount > 0 ? 'rgba(255, 255, 255, 0.08)' : 'rgba(57, 208, 255, 0.05)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.border = activeCount > 0 ? 'none' : '1px solid #242C3A'
+                e.currentTarget.style.borderColor = '#242C3A'
+                e.currentTarget.style.backgroundColor = activeCount > 0 ? 'rgba(255, 255, 255, 0.05)' : 'transparent'
               }}
               style={{
-                padding: '6px 16px',
+                padding: '8px 18px',
                 fontSize: '12px',
-                fontWeight: activeCount > 0 ? 600 : 400,
+                fontWeight: activeCount > 0 ? 500 : 400,
                 fontFamily: 'Albert Sans, sans-serif',
-                color: activeCount > 0 ? category.color : '#8F9BB0',
-                backgroundColor: activeCount > 0 ? `${category.color}15` : 'transparent',
-                border: activeCount > 0 ? 'none' : '1px solid #242C3A',
+                color: activeCount > 0 ? '#FFFFFF' : '#8F9BB0',
+                backgroundColor: activeCount > 0 ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                border: '1px solid #242C3A',
+                borderRadius: '100px',
                 cursor: 'pointer',
                 transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                 display: 'flex',
@@ -145,7 +149,7 @@ export default function LayerControls() {
               }}
             >
               <span style={{
-                color: activeCount > 0 ? category.color : '#8F9BB0',
+                color: activeCount > 0 ? '#FFFFFF' : '#8F9BB0',
                 transition: 'color 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                 display: 'inline-flex',
                 alignItems: 'center'
@@ -156,10 +160,11 @@ export default function LayerControls() {
               {activeCount > 0 && (
                 <span style={{
                   fontSize: '10px',
-                  fontWeight: 700,
-                  color: category.color,
-                  backgroundColor: `${category.color}25`,
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  backgroundColor: '#080D12',
                   padding: '2px 6px',
+                  borderRadius: '100px'
                 }}>
                   {activeCount}
                 </span>

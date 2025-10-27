@@ -129,13 +129,12 @@ export default function EnhancedChartModal({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.90)',
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 2000,
-        backdropFilter: 'blur(8px)',
-        padding: '24px'
+        padding: 0
       }}
       onClick={onClose}
     >
@@ -144,16 +143,16 @@ export default function EnhancedChartModal({
         onClick={(e) => e.stopPropagation()}
         style={{
           backgroundColor: '#0A0F16',
-          border: '1px solid #39D0FF',
+          border: '2px solid #242C3A',
+          borderTop: '4px solid #39D0FF',
           width: '100%',
-          maxWidth: '1600px',
-          maxHeight: '92vh',
+          height: '100vh',
+          maxWidth: '100vw',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
           fontFamily: 'Albert Sans, sans-serif',
-          boxShadow: '0 24px 48px rgba(57, 208, 255, 0.15)',
-          animation: 'modalSlideIn 300ms cubic-bezier(0.25, 0.1, 0.25, 1)'
+          animation: 'modalFadeIn 200ms ease-out'
         }}
       >
         {/* Header */}
@@ -161,9 +160,9 @@ export default function EnhancedChartModal({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '24px 32px',
+          padding: '32px',
           borderBottom: '1px solid #242C3A',
-          background: 'linear-gradient(to bottom, #141821, #0A0F16)'
+          backgroundColor: '#080D12'
         }}>
           <div style={{ flex: 1 }}>
             <div style={{
@@ -174,7 +173,7 @@ export default function EnhancedChartModal({
             }}>
               <span style={{
                 fontFamily: 'Geist Mono, monospace',
-                fontSize: '11px',
+                fontSize: '10px',
                 color: '#39D0FF',
                 fontWeight: 600,
                 letterSpacing: '0.5px',
@@ -185,11 +184,14 @@ export default function EnhancedChartModal({
               {category && (
                 <span style={{
                   fontSize: '10px',
-                  color: '#5E6A81',
+                  color: '#FFFFFF',
                   fontFamily: 'Geist Mono, monospace',
                   padding: '4px 8px',
-                  backgroundColor: '#141821',
-                  border: '1px solid #242C3A'
+                  backgroundColor: '#080D12',
+                  border: '1px solid #242C3A',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontWeight: 600
                 }}>
                   {category}
                 </span>
@@ -200,9 +202,11 @@ export default function EnhancedChartModal({
               style={{
                 fontSize: '24px',
                 color: '#FFFFFF',
-                fontWeight: 600,
+                fontWeight: 400,
+                fontFamily: 'Albert Sans, sans-serif',
                 margin: 0,
-                marginBottom: '4px'
+                marginBottom: '8px',
+                lineHeight: '1.2'
               }}
             >
               {chartName}
@@ -211,8 +215,10 @@ export default function EnhancedChartModal({
               <p style={{
                 fontSize: '13px',
                 color: '#8F9BB0',
+                fontFamily: 'Albert Sans, sans-serif',
                 margin: 0,
-                maxWidth: '600px'
+                maxWidth: '600px',
+                lineHeight: '1.5'
               }}>
                 {chartDescription}
               </p>
@@ -240,17 +246,15 @@ export default function EnhancedChartModal({
                     backgroundColor: 'transparent',
                     border: '1px solid #242C3A',
                     cursor: canNavigate.prev ? 'pointer' : 'not-allowed',
-                    transition: 'all 150ms ease',
+                    transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                     opacity: canNavigate.prev ? 1 : 0.4
                   }}
                   onMouseEnter={(e) => {
                     if (canNavigate.prev) {
-                      e.currentTarget.style.backgroundColor = '#242C3A'
                       e.currentTarget.style.borderColor = '#39D0FF'
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
                     e.currentTarget.style.borderColor = '#242C3A'
                   }}
                   aria-label="Previous chart"
@@ -270,17 +274,15 @@ export default function EnhancedChartModal({
                     backgroundColor: 'transparent',
                     border: '1px solid #242C3A',
                     cursor: canNavigate.next ? 'pointer' : 'not-allowed',
-                    transition: 'all 150ms ease',
+                    transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                     opacity: canNavigate.next ? 1 : 0.4
                   }}
                   onMouseEnter={(e) => {
                     if (canNavigate.next) {
-                      e.currentTarget.style.backgroundColor = '#242C3A'
                       e.currentTarget.style.borderColor = '#39D0FF'
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
                     e.currentTarget.style.borderColor = '#242C3A'
                   }}
                   aria-label="Next chart"
@@ -302,24 +304,27 @@ export default function EnhancedChartModal({
                   onClick={() => onExport('png')}
                   style={{
                     padding: '10px 14px',
-                    fontSize: '12px',
+                    fontSize: '11px',
                     fontFamily: 'Geist Mono, monospace',
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
                     color: '#C6CFDA',
                     backgroundColor: 'transparent',
                     border: '1px solid #242C3A',
                     cursor: 'pointer',
-                    transition: 'all 150ms ease',
+                    transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#242C3A'
                     e.currentTarget.style.borderColor = '#39D0FF'
+                    e.currentTarget.style.color = '#FFFFFF'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
                     e.currentTarget.style.borderColor = '#242C3A'
+                    e.currentTarget.style.color = '#C6CFDA'
                   }}
                   aria-label="Export as PNG"
                 >
@@ -330,24 +335,27 @@ export default function EnhancedChartModal({
                   onClick={() => onExport('csv')}
                   style={{
                     padding: '10px 14px',
-                    fontSize: '12px',
+                    fontSize: '11px',
                     fontFamily: 'Geist Mono, monospace',
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
                     color: '#C6CFDA',
                     backgroundColor: 'transparent',
                     border: '1px solid #242C3A',
                     cursor: 'pointer',
-                    transition: 'all 150ms ease',
+                    transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#242C3A'
                     e.currentTarget.style.borderColor = '#39D0FF'
+                    e.currentTarget.style.color = '#FFFFFF'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
                     e.currentTarget.style.borderColor = '#242C3A'
+                    e.currentTarget.style.color = '#C6CFDA'
                   }}
                   aria-label="Export as CSV"
                 >
@@ -370,7 +378,7 @@ export default function EnhancedChartModal({
                 backgroundColor: 'transparent',
                 border: '1px solid #242C3A',
                 cursor: 'pointer',
-                transition: 'all 150ms ease',
+                transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                 marginLeft: '8px'
               }}
               onMouseEnter={(e) => {
@@ -393,45 +401,49 @@ export default function EnhancedChartModal({
         {/* View Tabs */}
         <div style={{
           display: 'flex',
-          gap: '4px',
+          gap: '0px',
           padding: '16px 32px',
           borderBottom: '1px solid #242C3A',
-          backgroundColor: '#141821'
+          backgroundColor: '#0A0F16'
         }}>
           {[
-            { id: 'chart' as const, label: 'Visualization', icon: BarChart3 },
-            { id: 'data' as const, label: 'Data Table', icon: Table },
-            { id: 'insights' as const, label: 'Insights', icon: Info }
+            { id: 'chart' as const, label: 'Chart', icon: BarChart3 },
+            { id: 'data' as const, label: 'Data', icon: Table },
+            { id: 'insights' as const, label: 'Stats', icon: Info }
           ].map(view => (
             <button
               key={view.id}
               onClick={() => setActiveView(view.id)}
               style={{
-                padding: '10px 20px',
-                fontSize: '13px',
-                fontWeight: 500,
-                fontFamily: 'Albert Sans, sans-serif',
+                padding: '12px 16px',
+                fontSize: '11px',
+                fontWeight: 600,
+                fontFamily: 'Geist Mono, monospace',
+                letterSpacing: '0.5px',
+                textTransform: 'uppercase',
                 color: activeView === view.id ? '#FFFFFF' : '#8F9BB0',
-                backgroundColor: activeView === view.id ? '#39D0FF15' : 'transparent',
-                border: `1px solid ${activeView === view.id ? '#39D0FF' : 'transparent'}`,
+                backgroundColor: 'transparent',
+                border: '1px solid #242C3A',
+                borderLeft: activeView === view.id ? '3px solid #39D0FF' : '1px solid #242C3A',
                 cursor: 'pointer',
-                transition: 'all 200ms ease',
+                transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}
               onMouseEnter={(e) => {
                 if (activeView !== view.id) {
-                  e.currentTarget.style.backgroundColor = '#242C3A'
+                  e.currentTarget.style.borderColor = '#39D0FF'
                 }
               }}
               onMouseLeave={(e) => {
                 if (activeView !== view.id) {
-                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.borderColor = '#242C3A'
+                  e.currentTarget.style.borderLeft = '1px solid #242C3A'
                 }
               }}
             >
-              <view.icon size={16} />
+              <view.icon size={14} />
               {view.label}
             </button>
           ))}
@@ -548,7 +560,7 @@ export default function EnhancedChartModal({
                         style={{
                           backgroundColor: idx % 2 === 0 ? '#0A0F16' : '#141821',
                           borderBottom: '1px solid #242C3A',
-                          transition: 'background-color 150ms ease'
+                          transition: 'background-color 200ms cubic-bezier(0.25, 0.1, 0.25, 1)'
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = '#1A2332'
@@ -588,21 +600,27 @@ export default function EnhancedChartModal({
                             onClick={() => setSelectedDataPoint(point)}
                             style={{
                               padding: '6px 12px',
-                              fontSize: '11px',
+                              fontSize: '10px',
+                              fontFamily: 'Geist Mono, monospace',
+                              fontWeight: 600,
+                              letterSpacing: '0.5px',
+                              textTransform: 'uppercase',
                               color: '#39D0FF',
                               backgroundColor: 'transparent',
                               border: '1px solid #39D0FF',
                               cursor: 'pointer',
-                              transition: 'all 150ms ease'
+                              transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)'
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#39D0FF15'
+                              e.currentTarget.style.backgroundColor = '#39D0FF'
+                              e.currentTarget.style.color = '#080D12'
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.backgroundColor = 'transparent'
+                              e.currentTarget.style.color = '#39D0FF'
                             }}
                           >
-                            View Details
+                            Details
                           </button>
                         </td>
                       </tr>
@@ -917,14 +935,12 @@ export default function EnhancedChartModal({
       )}
 
       <style jsx>{`
-        @keyframes modalSlideIn {
+        @keyframes modalFadeIn {
           from {
             opacity: 0;
-            transform: scale(0.95);
           }
           to {
             opacity: 1;
-            transform: scale(1);
           }
         }
 

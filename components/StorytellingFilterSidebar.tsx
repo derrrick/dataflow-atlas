@@ -271,59 +271,44 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
                 onClick={() => applyPreset(preset)}
                 style={{
                   padding: '16px',
-                  backgroundColor: filters.storyPreset === preset.id ? `${preset.color}15` : '#141821',
+                  backgroundColor: filters.storyPreset === preset.id ? `${preset.color}15` : 'transparent',
                   border: `1px solid ${filters.storyPreset === preset.id ? preset.color : '#242C3A'}`,
+                  borderLeft: `3px solid ${preset.color}`,
                   cursor: 'pointer',
-                  transition: 'all 200ms ease',
-                  textAlign: 'left'
+                  transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
                 }}
                 onMouseEnter={(e) => {
                   if (filters.storyPreset !== preset.id) {
-                    e.currentTarget.style.backgroundColor = '#1A2332'
                     e.currentTarget.style.borderColor = preset.color
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (filters.storyPreset !== preset.id) {
-                    e.currentTarget.style.backgroundColor = '#141821'
                     e.currentTarget.style.borderColor = '#242C3A'
                   }
                 }}
               >
                 <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px'
+                  fontSize: '11px',
+                  color: preset.color,
+                  fontWeight: 600,
+                  fontFamily: 'Geist Mono, monospace',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase'
                 }}>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    backgroundColor: `${preset.color}15`,
-                    border: `1px solid ${preset.color}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <preset.icon size={18} color={preset.color} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: '13px',
-                      color: '#FFFFFF',
-                      fontWeight: 600,
-                      marginBottom: '4px'
-                    }}>
-                      {preset.name}
-                    </div>
-                    <div style={{
-                      fontSize: '11px',
-                      color: '#8F9BB0',
-                      lineHeight: '1.4'
-                    }}>
-                      {preset.description}
-                    </div>
-                  </div>
+                  {preset.name}
+                </div>
+                <div style={{
+                  fontSize: '11px',
+                  color: '#8F9BB0',
+                  lineHeight: '1.5',
+                  fontFamily: 'Albert Sans, sans-serif'
+                }}>
+                  {preset.description}
                 </div>
               </button>
             ))}
@@ -333,12 +318,13 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
         {/* Time Range */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{
-            fontSize: '11px',
+            fontSize: '10px',
             color: '#5E6A81',
             textTransform: 'uppercase',
-            letterSpacing: '0.8px',
-            marginBottom: '12px',
-            fontWeight: 600
+            letterSpacing: '0.5px',
+            marginBottom: '16px',
+            fontWeight: 600,
+            fontFamily: 'Geist Mono, monospace'
           }}>
             Time Period
           </div>
@@ -348,38 +334,41 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
             gap: '8px'
           }}>
             {[
-              { value: 'realtime', label: 'Now', emoji: '⚡' },
-              { value: '24h', label: 'Today', emoji: '📅' },
-              { value: 'week', label: 'This Week', emoji: '📊' },
-              { value: 'month', label: 'This Month', emoji: '📈' },
-              { value: 'all', label: 'All Time', emoji: '🌐' }
+              { value: 'realtime', label: 'Now' },
+              { value: '24h', label: 'Today' },
+              { value: 'week', label: 'Week' },
+              { value: 'month', label: 'Month' },
+              { value: 'all', label: 'All' }
             ].map(option => (
               <button
                 key={option.value}
                 onClick={() => updateFilter('timeRange', option.value as any)}
                 style={{
-                  padding: '10px',
-                  fontSize: '12px',
-                  fontWeight: 500,
+                  padding: '12px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  fontFamily: 'Geist Mono, monospace',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
                   color: filters.timeRange === option.value ? '#FFFFFF' : '#8F9BB0',
-                  backgroundColor: filters.timeRange === option.value ? '#39D0FF15' : '#141821',
+                  backgroundColor: filters.timeRange === option.value ? '#39D0FF15' : 'transparent',
                   border: `1px solid ${filters.timeRange === option.value ? '#39D0FF' : '#242C3A'}`,
                   cursor: 'pointer',
-                  transition: 'all 150ms ease',
+                  transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                   textAlign: 'center'
                 }}
                 onMouseEnter={(e) => {
                   if (filters.timeRange !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#1A2332'
+                    e.currentTarget.style.borderColor = '#39D0FF'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (filters.timeRange !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#141821'
+                    e.currentTarget.style.borderColor = '#242C3A'
                   }
                 }}
               >
-                {option.emoji} {option.label}
+                {option.label}
               </button>
             ))}
           </div>
@@ -388,62 +377,56 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
         {/* Severity */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{
-            fontSize: '11px',
+            fontSize: '10px',
             color: '#5E6A81',
             textTransform: 'uppercase',
-            letterSpacing: '0.8px',
-            marginBottom: '12px',
-            fontWeight: 600
+            letterSpacing: '0.5px',
+            marginBottom: '16px',
+            fontWeight: 600,
+            fontFamily: 'Geist Mono, monospace'
           }}>
-            Event Significance
+            Significance
           </div>
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'grid',
+            gridTemplateColumns: '1fr',
             gap: '8px'
           }}>
             {[
-              { value: 'all', label: 'All Events', color: '#8F9BB0' },
-              { value: 'significant', label: 'Significant Events', color: '#FF3B3B' },
-              { value: 'moderate', label: 'Moderate Events', color: '#FFB341' },
-              { value: 'minor', label: 'Minor Events', color: '#39D0FF' }
+              { value: 'all', label: 'All', color: '#8F9BB0' },
+              { value: 'significant', label: 'Significant', color: '#FF3B3B' },
+              { value: 'moderate', label: 'Moderate', color: '#FFB341' },
+              { value: 'minor', label: 'Minor', color: '#39D0FF' }
             ].map(option => (
               <button
                 key={option.value}
                 onClick={() => updateFilter('severity', option.value as any)}
                 style={{
                   padding: '12px 16px',
-                  fontSize: '13px',
-                  fontWeight: 500,
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  fontFamily: 'Geist Mono, monospace',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
                   color: filters.severity === option.value ? '#FFFFFF' : '#8F9BB0',
-                  backgroundColor: filters.severity === option.value ? `${option.color}15` : '#141821',
+                  backgroundColor: filters.severity === option.value ? `${option.color}15` : 'transparent',
                   border: `1px solid ${filters.severity === option.value ? option.color : '#242C3A'}`,
+                  borderLeft: `3px solid ${option.color}`,
                   cursor: 'pointer',
-                  transition: 'all 150ms ease',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px'
+                  transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+                  textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
                   if (filters.severity !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#1A2332'
                     e.currentTarget.style.borderColor = option.color
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (filters.severity !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#141821'
                     e.currentTarget.style.borderColor = '#242C3A'
                   }
                 }}
               >
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: option.color
-                }} />
                 {option.label}
               </button>
             ))}
@@ -453,64 +436,57 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
         {/* Narrative Focus */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{
-            fontSize: '11px',
+            fontSize: '10px',
             color: '#5E6A81',
             textTransform: 'uppercase',
-            letterSpacing: '0.8px',
-            marginBottom: '12px',
-            fontWeight: 600
+            letterSpacing: '0.5px',
+            marginBottom: '16px',
+            fontWeight: 600,
+            fontFamily: 'Geist Mono, monospace'
           }}>
-            Narrative Focus
+            Narrative
           </div>
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'grid',
+            gridTemplateColumns: '1fr',
             gap: '8px'
           }}>
             {[
-              { value: 'all', label: 'All Perspectives', desc: 'Show everything' },
-              { value: 'overview', label: 'Big Picture', desc: 'High-level summaries' },
-              { value: 'trends', label: 'Patterns Over Time', desc: 'Temporal analysis' },
-              { value: 'impacts', label: 'Geographic Impact', desc: 'Where events occur' },
-              { value: 'comparisons', label: 'Side-by-Side', desc: 'Compare data types' }
+              { value: 'all', label: 'All' },
+              { value: 'overview', label: 'Overview' },
+              { value: 'trends', label: 'Trends' },
+              { value: 'impacts', label: 'Impacts' },
+              { value: 'comparisons', label: 'Compare' }
             ].map(option => (
               <button
                 key={option.value}
                 onClick={() => updateFilter('narrative', option.value as any)}
                 style={{
                   padding: '12px 16px',
-                  fontSize: '13px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  fontFamily: 'Geist Mono, monospace',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
                   color: filters.narrative === option.value ? '#FFFFFF' : '#8F9BB0',
-                  backgroundColor: filters.narrative === option.value ? '#39D0FF15' : '#141821',
+                  backgroundColor: filters.narrative === option.value ? '#39D0FF15' : 'transparent',
                   border: `1px solid ${filters.narrative === option.value ? '#39D0FF' : '#242C3A'}`,
                   cursor: 'pointer',
-                  transition: 'all 150ms ease',
+                  transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
                   if (filters.narrative !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#1A2332'
+                    e.currentTarget.style.borderColor = '#39D0FF'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (filters.narrative !== option.value) {
-                    e.currentTarget.style.backgroundColor = '#141821'
+                    e.currentTarget.style.borderColor = '#242C3A'
                   }
                 }}
               >
-                <div style={{
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  marginBottom: '4px'
-                }}>
-                  {option.label}
-                </div>
-                <div style={{
-                  fontSize: '11px',
-                  color: '#5E6A81'
-                }}>
-                  {option.desc}
-                </div>
+                {option.label}
               </button>
             ))}
           </div>

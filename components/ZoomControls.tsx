@@ -14,8 +14,9 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
       display: 'flex',
       flexDirection: 'column',
       gap: '1px',
-      backgroundColor: '#141821',
+      backgroundColor: 'rgba(10, 15, 22, 0.5)',
       border: '1px solid #242C3A',
+      borderRadius: '100px',
       overflow: 'hidden',
     }}>
       <button
@@ -27,7 +28,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
           if (svg) svg.style.color = '#39D0FF'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#141821'
+          e.currentTarget.style.backgroundColor = 'transparent'
           e.currentTarget.style.boxShadow = 'none'
           const svg = e.currentTarget.querySelector('svg')
           if (svg) svg.style.color = '#C6CFDA'
@@ -35,7 +36,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
         style={{
           width: '40px',
           height: '40px',
-          backgroundColor: '#141821',
+          backgroundColor: 'transparent',
           border: 'none',
           borderBottom: '1px solid #242C3A',
           cursor: 'pointer',
@@ -57,7 +58,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
           if (svg) svg.style.color = '#39D0FF'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#141821'
+          e.currentTarget.style.backgroundColor = 'transparent'
           e.currentTarget.style.boxShadow = 'none'
           const svg = e.currentTarget.querySelector('svg')
           if (svg) svg.style.color = '#C6CFDA'
@@ -65,7 +66,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
         style={{
           width: '40px',
           height: '40px',
-          backgroundColor: '#141821',
+          backgroundColor: 'transparent',
           border: 'none',
           borderBottom: '1px solid #242C3A',
           cursor: 'pointer',
@@ -87,7 +88,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
           if (svg) svg.style.color = '#39D0FF'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = '#141821'
+          e.currentTarget.style.backgroundColor = 'transparent'
           e.currentTarget.style.boxShadow = 'none'
           const svg = e.currentTarget.querySelector('svg')
           if (svg) svg.style.color = '#C6CFDA'
@@ -95,7 +96,7 @@ export default function ZoomControls({ onZoomIn, onZoomOut, onReset }: ZoomContr
         style={{
           width: '40px',
           height: '40px',
-          backgroundColor: '#141821',
+          backgroundColor: 'transparent',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',

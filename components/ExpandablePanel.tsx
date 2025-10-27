@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, ReactNode } from 'react'
-import { ChevronUp, ChevronDown, BookOpen } from 'lucide-react'
+import { ChevronUp, ChevronDown, Map, BookOpen } from 'lucide-react'
 
 interface ExpandablePanelProps {
   collapsedContent: ReactNode
@@ -21,9 +21,9 @@ export default function ExpandablePanel({ collapsedContent, expandedContent }: E
       borderTop: '1px solid #242C3A',
       backgroundColor: '#141821',
       position: isExpanded ? 'fixed' : 'relative',
-      top: isExpanded ? '60px' : 'auto',
+      top: isExpanded ? '68px' : 'auto',
       left: isExpanded ? 0 : 'auto',
-      height: isExpanded ? 'calc(100vh - 60px)' : 'auto',
+      height: isExpanded ? 'calc(100vh - 68px)' : 'auto',
       transition: 'height 300ms cubic-bezier(0.4, 0, 0.2, 1)',
       overflow: isExpanded ? 'hidden' : 'visible',
       zIndex: isExpanded ? 1000 : 'auto'
@@ -31,7 +31,7 @@ export default function ExpandablePanel({ collapsedContent, expandedContent }: E
       {/* Toggle CTA - Top Center */}
       <div style={{
         position: isExpanded ? 'fixed' : 'absolute',
-        top: isExpanded ? '44px' : '-16px',
+        top: isExpanded ? '52px' : '-64px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: isExpanded ? 1001 : 101
@@ -39,43 +39,41 @@ export default function ExpandablePanel({ collapsedContent, expandedContent }: E
         <button
           onClick={toggleExpanded}
           style={{
-            height: '32px',
-            padding: '0 16px',
+            padding: '14px 28px',
             border: '1px solid #242C3A',
-            backgroundColor: '#141821',
+            backgroundColor: isExpanded ? '#0A0F16' : 'rgba(10, 15, 22, 0.5)',
+            borderRadius: '100px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
             cursor: 'pointer',
-            color: '#8F9BB0',
-            transition: 'all 200ms ease',
-            fontSize: '12px',
+            color: '#FFFFFF',
+            transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+            fontSize: '14px',
             fontFamily: 'Albert Sans, sans-serif',
             fontWeight: 500,
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            boxShadow: 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#FFFFFF'
-            e.currentTarget.style.backgroundColor = '#39D0FF15'
+            e.currentTarget.style.backgroundColor = '#141821'
             e.currentTarget.style.borderColor = '#39D0FF'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(57, 208, 255, 0.2)'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#8F9BB0'
-            e.currentTarget.style.backgroundColor = '#141821'
+            e.currentTarget.style.backgroundColor = isExpanded ? '#0A0F16' : 'rgba(10, 15, 22, 0.5)'
             e.currentTarget.style.borderColor = '#242C3A'
-            e.currentTarget.style.boxShadow = 'none'
           }}
         >
           {isExpanded ? (
             <>
+              <Map size={14} />
+              <span>Back to Map</span>
               <ChevronDown size={14} />
-              <span>Back to Overview</span>
             </>
           ) : (
             <>
               <BookOpen size={14} />
-              <span>Explore Data Stories</span>
+              <span>Explore the data</span>
               <ChevronUp size={14} />
             </>
           )}

@@ -194,6 +194,35 @@
 
 ---
 
+## Epic 16 — Custom Alerts & User Authentication (P1)
+**Goal:** Enable authenticated users to create custom threshold-based alerts for real-time environmental data.
+**Owner:** ENG + PM
+**Est.:** 4 days
+
+**Tasks**
+- [ ] Supabase Auth setup: enable email/OAuth providers (Google, GitHub). (0.5d)
+- [ ] Resend integration for magic link OTP authentication flow. (0.5d)
+- [ ] User session management + protected routes/API endpoints. (0.5d)
+- [ ] Alert subscription schema: data types, thresholds, notification preferences. (0.5d)
+- [ ] Alert creation UI: form for selecting data type, location, threshold values. (1d)
+- [ ] Real-time monitoring service: Supabase Edge Functions polling unified_events. (1d)
+- [ ] Email notification pipeline via Resend when thresholds exceeded. (0.5d)
+- [ ] User dashboard: manage alerts, view history, update notification settings. (0.5d)
+
+**Accept:** Users can sign in, create magnitude/AQI/brightness alerts, receive emails when triggered; dashboard shows alert history.
+
+**Dependencies:**
+- Epic 3 (Data contracts must be stable)
+- Epic 7 (Security baseline required for auth flows)
+
+**Future enhancements:**
+- SMS/Slack/webhook notifications
+- Geographic radius-based alerts
+- Multi-condition logic (AND/OR operators)
+- Alert templates library
+
+---
+
 ## Sequence plan (30/60/90)
 - **Days 0–14 (MVP):** Epics 1,2,3,6,7,9,13.  
 - **Days 15–30:** Epics 4,5,8,10,11,14.  
@@ -208,7 +237,7 @@ PM = Product · PD = Product Design · ENG = Engineering · DS = Data Science ·
 ---
 
 ## Roll-up estimate
-- P0 total: ~12.5 days  
-- P1 total: ~9.5 days  
-- P2 total: ~4 days  
-Parallelizable; solo pace ≈ 4–6 weeks elapsed.
+- P0 total: ~12.5 days
+- P1 total: ~13.5 days (includes Epic 16: Custom Alerts)
+- P2 total: ~4 days
+Parallelizable; solo pace ≈ 5–7 weeks elapsed.
