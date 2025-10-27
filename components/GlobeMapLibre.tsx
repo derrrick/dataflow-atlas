@@ -768,12 +768,13 @@ export default function GlobeMapLibre() {
       backgroundColor: '#141821',
       zIndex: 1
     }}>
+      {/* Ocean texture overlay - fixed pixel size at all zoom levels, behind map */}
       <div
-        ref={mapContainer}
         style={{
+          position: 'absolute',
+          inset: 0,
           width: '100%',
           height: '100%',
-          position: 'relative',
           zIndex: 1,
           background: `repeating-linear-gradient(
             45deg,
@@ -782,6 +783,16 @@ export default function GlobeMapLibre() {
             rgba(36, 44, 58, 0.3) 12px,
             rgba(36, 44, 58, 0.3) 13px
           )`
+        }}
+      />
+
+      <div
+        ref={mapContainer}
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          zIndex: 2
         }}
       />
 
