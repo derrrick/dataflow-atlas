@@ -63,7 +63,8 @@ export default function GlobeMapLibre() {
           source: 'openmaptiles',
           'source-layer': 'countries',
           paint: {
-            'fill-color': '#0A0F16'
+            'fill-color': '#0A0F16',
+            'fill-opacity': 1
           }
         },
         {
@@ -92,39 +93,6 @@ export default function GlobeMapLibre() {
 
     map.on('load', () => {
       console.log('✅ Map loaded')
-
-      // Create diagonal line pattern for ocean texture
-      const size = 24 // Pattern size (12px spacing * 2 for diagonal)
-      const canvas = document.createElement('canvas')
-      canvas.width = size
-      canvas.height = size
-      const ctx = canvas.getContext('2d')
-
-      if (ctx) {
-        // Clear canvas
-        ctx.clearRect(0, 0, size, size)
-
-        // Draw diagonal line
-        ctx.strokeStyle = 'rgba(36, 44, 58, 0.3)'
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.moveTo(0, size)
-        ctx.lineTo(size, 0)
-        ctx.stroke()
-
-        // Get ImageData from canvas
-        const imageData = ctx.getImageData(0, 0, size, size)
-
-        // Add pattern as image to map with proper format
-        map.addImage('ocean-texture', {
-          width: size,
-          height: size,
-          data: imageData.data
-        })
-
-        // Apply pattern to background layer
-        map.setPaintProperty('background', 'background-pattern', 'ocean-texture')
-      }
 
       // Add GeoJSON sources
       map.addSource('earthquakes-src', {
@@ -806,7 +774,14 @@ export default function GlobeMapLibre() {
           width: '100%',
           height: '100%',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          background: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 12px,
+            rgba(36, 44, 58, 0.3) 12px,
+            rgba(36, 44, 58, 0.3) 13px
+          )`
         }}
       />
 
