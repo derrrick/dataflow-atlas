@@ -83,6 +83,9 @@ export interface SevereWeather {
   urgency: 'Immediate' | 'Expected' | 'Future' | 'Past' | 'Unknown'
   certainty?: 'Observed' | 'Likely' | 'Possible' | 'Unlikely' | 'Unknown'
   headline: string
+  description?: string
+  instruction?: string
+  areaDesc?: string
   location: string
   time: string
   timestamp: number

@@ -157,8 +157,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, ['*', ['get', 'magnitude'], 5],
             8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
           ]
@@ -186,8 +186,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'case',
               ['==', ['get', 'severity'], 'High'], 12,
@@ -229,13 +229,13 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 2,
+              0, 1,
               50000, 8,
               200000, 14
             ],
@@ -245,7 +245,7 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 2,
+                0, 1,
                 50000, 8,
                 200000, 14
               ],
@@ -276,8 +276,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -325,8 +325,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -374,8 +374,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'case',
               ['==', ['get', 'severity'], 'Extreme'], 14,
@@ -419,8 +419,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -468,8 +468,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, ['*', ['get', 'intensity'], 5],
             8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
           ]
@@ -490,8 +490,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, ['*', ['get', 'magnitude'], 5],
             8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
           ]
@@ -511,8 +511,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'case',
               ['==', ['get', 'severity'], 'High'], 12,
@@ -546,13 +546,13 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 2,
+              0, 1,
               50000, 8,
               200000, 14
             ],
@@ -562,7 +562,7 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 2,
+                0, 1,
                 50000, 8,
                 200000, 14
               ],
@@ -585,8 +585,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -626,8 +626,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -667,8 +667,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'case',
               ['==', ['get', 'severity'], 'Extreme'], 14,
@@ -704,8 +704,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, [
               'interpolate',
               ['linear'],
@@ -745,8 +745,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 2,
-            3, 2,
+            0, 1,
+            3, 1,
             4, ['*', ['get', 'intensity'], 5],
             8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
           ]
@@ -821,6 +821,9 @@ export default function GlobeMapLibre() {
               headline: props?.headline,
               certainty: props?.certainty,
               expires: props?.expires,
+              description: props?.description,
+              instruction: props?.instruction,
+              areaDesc: props?.areaDesc,
               location: props?.location,
               time: props?.time
             }
@@ -867,8 +870,8 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, ['*', ['get', 'magnitude'], 5 * rippleScale],
           8, ['*', ['*', ['get', 'magnitude'], 5 * rippleScale], 1.8]
         ])
@@ -885,11 +888,11 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'case',
-            ['==', ['get', 'severity'], 'High'], 12 * rippleScale,
+            ['==', ['get', 'severity'], 'High'], 11 * rippleScale,
             ['==', ['get', 'severity'], 'Medium'], 9 * rippleScale,
             6 * rippleScale
           ],
@@ -897,7 +900,7 @@ export default function GlobeMapLibre() {
             '*',
             [
               'case',
-              ['==', ['get', 'severity'], 'High'], 12 * rippleScale,
+              ['==', ['get', 'severity'], 'High'], 11 * rippleScale,
               ['==', ['get', 'severity'], 'Medium'], 9 * rippleScale,
               6 * rippleScale
             ],
@@ -917,13 +920,13 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
             ['get', 'affected'],
-            0, 2 * rippleScale,
+            0, 1 * rippleScale,
             50000, 8 * rippleScale,
             200000, 14 * rippleScale
           ],
@@ -933,7 +936,7 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 2 * rippleScale,
+              0, 1 * rippleScale,
               50000, 8 * rippleScale,
               200000, 14 * rippleScale
             ],
@@ -953,8 +956,8 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
@@ -962,7 +965,7 @@ export default function GlobeMapLibre() {
             0, 3 * rippleScale,
             100, 5 * rippleScale,
             300, 9 * rippleScale,
-            500, 12 * rippleScale
+            500, 11 * rippleScale
           ],
           8, [
             '*',
@@ -973,7 +976,7 @@ export default function GlobeMapLibre() {
               0, 3 * rippleScale,
               100, 5 * rippleScale,
               300, 9 * rippleScale,
-              500, 12 * rippleScale
+              500, 11 * rippleScale
             ],
             1.8
           ]
@@ -991,15 +994,15 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
             ['get', 'customers_out'],
             0, 5 * rippleScale,
             10000, 8 * rippleScale,
-            50000, 12 * rippleScale,
+            50000, 11 * rippleScale,
             100000, 16 * rippleScale
           ],
           8, [
@@ -1010,7 +1013,7 @@ export default function GlobeMapLibre() {
               ['get', 'customers_out'],
               0, 5 * rippleScale,
               10000, 8 * rippleScale,
-              50000, 12 * rippleScale,
+              50000, 11 * rippleScale,
               100000, 16 * rippleScale
             ],
             1.8
@@ -1029,8 +1032,8 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'case',
             ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
@@ -1063,8 +1066,8 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
@@ -1101,8 +1104,8 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 2 * rippleScale,
-          3, 2 * rippleScale,
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
           4, ['*', ['get', 'intensity'], 5 * rippleScale],
           8, ['*', ['*', ['get', 'intensity'], 5 * rippleScale], 1.8]
         ])
@@ -1292,6 +1295,9 @@ export default function GlobeMapLibre() {
         certainty: weather.certainty,
         headline: weather.headline,
         expires: weather.expires,
+        description: weather.description,
+        instruction: weather.instruction,
+        areaDesc: weather.areaDesc,
         location: weather.location,
         time: weather.time
       }

@@ -19,6 +19,9 @@ interface MapPopupProps {
     headline?: string
     certainty?: string
     expires?: string
+    description?: string
+    instruction?: string
+    areaDesc?: string
   }
 }
 
@@ -236,6 +239,24 @@ export default function MapPopup({ type, data }: MapPopupProps) {
             </div>
           ` : ''}
         </div>
+        ${data.areaDesc ? `
+          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-radius: 4px; border: 1px solid #242C3A;">
+            <div style="font-size: 11px; color: #8F9BB0; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Affected Areas</div>
+            <div style="font-size: 12px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.4;">${data.areaDesc}</div>
+          </div>
+        ` : ''}
+        ${data.description ? `
+          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-radius: 4px; border: 1px solid #242C3A; max-height: 120px; overflow-y: auto;">
+            <div style="font-size: 11px; color: #8F9BB0; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Details</div>
+            <div style="font-size: 11px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.5;">${data.description.substring(0, 400)}${data.description.length > 400 ? '...' : ''}</div>
+          </div>
+        ` : ''}
+        ${data.instruction ? `
+          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-left: 3px solid #FFB341; border-radius: 4px;">
+            <div style="font-size: 11px; color: #FFB341; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">⚠️ Safety Instructions</div>
+            <div style="font-size: 11px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.5;">${data.instruction.substring(0, 300)}${data.instruction.length > 300 ? '...' : ''}</div>
+          </div>
+        ` : ''}
         ${data.certainty ? `
           <div style="margin-bottom: 8px;">
             <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Certainty</span>

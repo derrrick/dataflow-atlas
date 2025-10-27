@@ -115,6 +115,20 @@ export default function AnalyticalStrip() {
           component: <Sparkline unified={earthquakeUnified} width={1200} height={700} />,
           data: earthquakeUnified
         }
+      case 'sparkline-wildfires':
+        return {
+          name: 'Wildfire Activity Trends',
+          description: 'Real-time wildfire detection showing brightness and intensity patterns',
+          component: <Sparkline unified={wildfireUnified} width={1200} height={700} />,
+          data: wildfireUnified
+        }
+      case 'sparkline-air-quality':
+        return {
+          name: 'Air Quality Trends',
+          description: 'Air Quality Index (AQI) measurements across major cities',
+          component: <Sparkline unified={airQualityUnified} width={1200} height={700} />,
+          data: airQualityUnified
+        }
       case 'slopegraph-power':
         return {
           name: 'Power Outage Changes',
@@ -149,55 +163,90 @@ export default function AnalyticalStrip() {
     }
   }
 
+  // Define all available charts with their data requirements and priority
+  const availableCharts = [
+    {
+      id: 'sparkline-earthquakes',
+      name: 'Earthquake Activity',
+      component: <Sparkline unified={earthquakeUnified} width={280} height={180} />,
+      hasData: earthquakeUnified.length >= 2,
+      priority: earthquakeUnified.length * 3, // Higher priority for more data
+      dataCount: earthquakeUnified.length
+    },
+    {
+      id: 'slopegraph-power',
+      name: 'Power Outages',
+      component: <Slopegraph unified={powerOutageUnified} width={280} height={180} />,
+      hasData: powerOutageUnified.length >= 2,
+      priority: powerOutageUnified.length * 2.5,
+      dataCount: powerOutageUnified.length
+    },
+    {
+      id: 'small-multiples-all',
+      name: 'Multi-Source View',
+      component: (
+        <SmallMultiples
+          earthquakes={earthquakeUnified}
+          wildfires={wildfireUnified}
+          airQuality={airQualityUnified}
+          width={280}
+          height={180}
+        />
+      ),
+      hasData: (earthquakeUnified.length + wildfireUnified.length + airQualityUnified.length) >= 3,
+      priority: (earthquakeUnified.length + wildfireUnified.length + airQualityUnified.length) * 2,
+      dataCount: earthquakeUnified.length + wildfireUnified.length + airQualityUnified.length
+    },
+    {
+      id: 'timeseries-weather',
+      name: 'Severe Weather',
+      component: <TimeSeries unified={severeWeatherUnified} width={280} height={180} />,
+      hasData: severeWeatherUnified.length >= 2,
+      priority: severeWeatherUnified.length * 2.8,
+      dataCount: severeWeatherUnified.length
+    },
+    {
+      id: 'sparkline-wildfires',
+      name: 'Wildfire Activity',
+      component: <Sparkline unified={wildfireUnified} width={280} height={180} />,
+      hasData: wildfireUnified.length >= 2,
+      priority: wildfireUnified.length * 2.6,
+      dataCount: wildfireUnified.length
+    },
+    {
+      id: 'sparkline-air-quality',
+      name: 'Air Quality Trends',
+      component: <Sparkline unified={airQualityUnified} width={280} height={180} />,
+      hasData: airQualityUnified.length >= 2,
+      priority: airQualityUnified.length * 2.4,
+      dataCount: airQualityUnified.length
+    }
+  ]
+
+  // Select top 4 charts with data, prioritized by data count and type
+  const selectedCharts = availableCharts
+    .filter(chart => chart.hasData)
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, 4)
+
+  // If we have fewer than 4 charts with data, show what we have
+  const chartsToShow = selectedCharts.length > 0 ? selectedCharts : availableCharts.slice(0, 4)
+
   return (
     <>
       <div style={{ overflowX: 'auto' }}>
         <div style={{ display: 'flex', gap: '16px' }}>
-          {/* Sparkline - Earthquakes */}
-          <div
-            style={getTileStyle('sparkline-earthquakes')}
-            onClick={() => setSelectedChartId('sparkline-earthquakes')}
-            onMouseEnter={() => setHoveredTile('sparkline-earthquakes')}
-            onMouseLeave={() => setHoveredTile(null)}
-          >
-            <Sparkline unified={earthquakeUnified} width={280} height={180} />
-          </div>
-
-          {/* Slopegraph - Power Outages */}
-          <div
-            style={getTileStyle('slopegraph-power')}
-            onClick={() => setSelectedChartId('slopegraph-power')}
-            onMouseEnter={() => setHoveredTile('slopegraph-power')}
-            onMouseLeave={() => setHoveredTile(null)}
-          >
-            <Slopegraph unified={powerOutageUnified} width={280} height={180} />
-          </div>
-
-          {/* Small Multiples - All Data Sources */}
-          <div
-            style={getTileStyle('small-multiples-all')}
-            onClick={() => setSelectedChartId('small-multiples-all')}
-            onMouseEnter={() => setHoveredTile('small-multiples-all')}
-            onMouseLeave={() => setHoveredTile(null)}
-          >
-            <SmallMultiples
-              earthquakes={earthquakeUnified}
-              wildfires={wildfireUnified}
-              airQuality={airQualityUnified}
-              width={280}
-              height={180}
-            />
-          </div>
-
-          {/* Time Series - Severe Weather */}
-          <div
-            style={getTileStyle('timeseries-weather')}
-            onClick={() => setSelectedChartId('timeseries-weather')}
-            onMouseEnter={() => setHoveredTile('timeseries-weather')}
-            onMouseLeave={() => setHoveredTile(null)}
-          >
-            <TimeSeries unified={severeWeatherUnified} width={280} height={180} />
-          </div>
+          {chartsToShow.map(chart => (
+            <div
+              key={chart.id}
+              style={getTileStyle(chart.id)}
+              onClick={() => setSelectedChartId(chart.id)}
+              onMouseEnter={() => setHoveredTile(chart.id)}
+              onMouseLeave={() => setHoveredTile(null)}
+            >
+              {chart.component}
+            </div>
+          ))}
         </div>
       </div>
 
