@@ -63,6 +63,31 @@ export interface Wildfire {
   satellite: 'MODIS' | 'VIIRS' | 'Unknown'
 }
 
+export interface PowerOutage {
+  id: string
+  coords: [number, number]
+  customers_out: number
+  percentage_out: number
+  state: string
+  location: string
+  time: string
+  timestamp: number
+  severity: 'Minor' | 'Moderate' | 'Significant' | 'Major' | 'Severe'
+}
+
+export interface SevereWeather {
+  id: string
+  coords: [number, number]
+  event: string // e.g., "Tornado Warning", "Hurricane Watch"
+  severity: 'Extreme' | 'Severe' | 'Moderate' | 'Minor' | 'Unknown'
+  urgency: 'Immediate' | 'Expected' | 'Future' | 'Past' | 'Unknown'
+  headline: string
+  location: string
+  time: string
+  timestamp: number
+  expires: string
+}
+
 export interface DataServiceResponse<T> {
   data: T[]
   error?: string
@@ -91,5 +116,5 @@ export interface UnifiedDataPoint {
   layerLabel: string        // Human-readable layer name
 
   // Original data preserved for specialized charts
-  rawData: Earthquake | Wildfire | AirQuality | Hazard | Outage | LatencyPoint
+  rawData: Earthquake | Wildfire | AirQuality | Hazard | Outage | LatencyPoint | PowerOutage | SevereWeather
 }

@@ -190,7 +190,7 @@ export const chartRegistry: ChartMetadata[] = [
     implemented: true,
     Component: DualTimeline,
     gridColumn: 2, // Span 2 columns (double-wide)
-    height: 350 // Taller for better timeline visibility
+    height: 400 // Match standard tile height
   },
   {
     id: 'slopegraph',

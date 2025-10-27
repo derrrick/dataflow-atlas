@@ -144,11 +144,14 @@ export default function LayerControls() {
                 gap: '8px'
               }}
             >
-              <category.Icon
-                size={14}
-                color={activeCount > 0 ? category.color : '#8F9BB0'}
-                style={{ transition: 'color 200ms cubic-bezier(0.25, 0.1, 0.25, 1)' }}
-              />
+              <span style={{
+                color: activeCount > 0 ? category.color : '#8F9BB0',
+                transition: 'color 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
+                display: 'inline-flex',
+                alignItems: 'center'
+              }}>
+                <category.Icon size={14} />
+              </span>
               {category.label}
               {activeCount > 0 && (
                 <span style={{

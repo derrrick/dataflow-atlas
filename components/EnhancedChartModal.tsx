@@ -89,7 +89,7 @@ export default function EnhancedChartModal({
     avgPrimary: data.length > 0 ? (data.reduce((sum, d) => sum + d.primaryValue, 0) / data.length).toFixed(2) : '0',
     maxPrimary: data.length > 0 ? Math.max(...data.map(d => d.primaryValue)).toFixed(2) : '0',
     minPrimary: data.length > 0 ? Math.min(...data.map(d => d.primaryValue)).toFixed(2) : '0',
-    dataTypes: [...new Set(data.map(d => d.dataType))],
+    layerTypes: [...new Set(data.map(d => d.layerType))],
     timeRange: data.length > 0 ? {
       start: new Date(Math.min(...data.map(d => d.timestamp))),
       end: new Date(Math.max(...data.map(d => d.timestamp)))
@@ -103,9 +103,9 @@ export default function EnhancedChartModal({
       const query = filterQuery.toLowerCase()
       return (
         d.id.toLowerCase().includes(query) ||
-        d.dataType.toLowerCase().includes(query) ||
-        d.source?.toLowerCase().includes(query) ||
-        JSON.stringify(d.metadata || {}).toLowerCase().includes(query)
+        d.layerType.toLowerCase().includes(query) ||
+        d.layerLabel.toLowerCase().includes(query) ||
+        d.location.toLowerCase().includes(query)
       )
     })
     .sort((a, b) => {
@@ -563,12 +563,12 @@ export default function EnhancedChartModal({
                         <td style={{ padding: '10px 16px', color: '#C6CFDA' }}>
                           <span style={{
                             padding: '4px 8px',
-                            backgroundColor: point.dataType === 'earthquake' ? '#FF3B3B15' : point.dataType === 'wildfire' ? '#FFB34115' : '#39D0FF15',
-                            color: point.dataType === 'earthquake' ? '#FF3B3B' : point.dataType === 'wildfire' ? '#FFB341' : '#39D0FF',
+                            backgroundColor: point.layerType === 'earthquake' ? '#FF3B3B15' : point.layerType === 'wildfire' ? '#FFB34115' : '#39D0FF15',
+                            color: point.layerType === 'earthquake' ? '#FF3B3B' : point.layerType === 'wildfire' ? '#FFB341' : '#39D0FF',
                             fontSize: '11px',
                             fontWeight: 600
                           }}>
-                            {point.dataType}
+                            {point.layerType}
                           </span>
                         </td>
                         <td style={{ padding: '10px 16px', color: '#C6CFDA' }}>
@@ -578,10 +578,10 @@ export default function EnhancedChartModal({
                           {point.secondaryValue?.toFixed(2) || 'N/A'}
                         </td>
                         <td style={{ padding: '10px 16px', color: '#8F9BB0' }}>
-                          {point.source || 'Unknown'}
+                          {point.layerLabel}
                         </td>
                         <td style={{ padding: '10px 16px', color: '#8F9BB0', fontSize: '11px' }}>
-                          {point.location.lat.toFixed(2)}, {point.location.lon.toFixed(2)}
+                          {point.coords[0].toFixed(2)}, {point.coords[1].toFixed(2)}
                         </td>
                         <td style={{ padding: '10px 16px' }}>
                           <button
@@ -793,7 +793,7 @@ export default function EnhancedChartModal({
                   gap: '12px',
                   flexWrap: 'wrap'
                 }}>
-                  {stats.dataTypes.map((type, index) => (
+                  {stats.layerTypes.map((type, index) => (
                     <span
                       key={`${type}-${index}`}
                       style={{
@@ -806,7 +806,7 @@ export default function EnhancedChartModal({
                         border: `1px solid ${type === 'earthquake' ? '#FF3B3B' : type === 'wildfire' ? '#FFB341' : '#39D0FF'}`
                       }}
                     >
-                      {type} ({data.filter(d => d.dataType === type).length})
+                      {type} ({data.filter(d => d.layerType === type).length})
                     </span>
                   ))}
                 </div>

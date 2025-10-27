@@ -23,34 +23,6 @@ function getQualityCategory(aqi: number): AirQuality['quality'] {
   return 'Hazardous'
 }
 
-// Generate demo air quality data
-function generateDemoAirQuality(): AirQuality[] {
-  const cities = [
-    { coords: [34.05, -118.24] as [number, number], location: 'Los Angeles, USA', pm25: 45 },
-    { coords: [39.91, 116.40] as [number, number], location: 'Beijing, China', pm25: 85 },
-    { coords: [19.43, -99.13] as [number, number], location: 'Mexico City, Mexico', pm25: 62 },
-    { coords: [28.61, 77.21] as [number, number], location: 'Delhi, India', pm25: 155 },
-    { coords: [51.51, -0.13] as [number, number], location: 'London, UK', pm25: 28 },
-    { coords: [35.68, 139.65] as [number, number], location: 'Tokyo, Japan', pm25: 18 },
-  ]
-
-  const now = Date.now()
-
-  return cities.map((city, idx) => {
-    const aqi = calculateAQI(city.pm25)
-    return {
-      id: `demo-aq-${idx}`,
-      coords: city.coords,
-      pm25: city.pm25,
-      aqi,
-      quality: getQualityCategory(aqi),
-      location: city.location,
-      time: formatRelativeTime(now - idx * 30 * 60 * 1000), // Stagger by 30 min
-      timestamp: now - idx * 30 * 60 * 1000,
-    }
-  })
-}
-
 export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>> {
   try {
     // Fetch real air quality data from Supabase
@@ -79,15 +51,15 @@ export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>
     console.log(`✅ Fetched ${airQuality.length} real air quality observations from Supabase`)
 
     return {
-      data: airQuality.length > 0 ? airQuality : generateDemoAirQuality(),
+      data: airQuality,
       timestamp: Date.now(),
       cached: false,
     }
   } catch (error) {
-    console.warn('⚠️ Supabase unavailable. Using demo data.')
+    console.warn('⚠️ Supabase unavailable. Returning empty data.')
     console.warn('Error:', error)
     return {
-      data: generateDemoAirQuality(),
+      data: [],
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now(),
       cached: false,

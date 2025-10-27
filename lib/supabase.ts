@@ -37,7 +37,7 @@ export const supabaseAdmin = supabaseServiceKey
 export interface UnifiedEvent {
   id: string
   timestamp: number
-  data_type: 'earthquake' | 'wildfire' | 'air_quality'
+  data_type: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather'
   primary_value: number
   secondary_value?: number
   location: {
@@ -45,6 +45,7 @@ export interface UnifiedEvent {
     lon: number
   }
   confidence?: 'high' | 'medium' | 'low'
+  source?: string
   color: string
   metadata?: Record<string, any>
   created_at?: string

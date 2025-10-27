@@ -49,7 +49,7 @@ const LayerContext = createContext<LayerContextType | undefined>(undefined)
 export function LayerProvider({ children }: { children: ReactNode }) {
   // Start with demo layers active (legacy compatibility)
   const [activeLayers, setActiveLayers] = useState<Set<Layer | LegacyLayer>>(
-    new Set(['earthquakes', 'power-outages', 'latency'])
+    new Set(['earthquakes', 'power-outages', 'severe-weather', 'latency'])
   )
 
   const toggleLayer = (layerId: Layer | LegacyLayer) => {

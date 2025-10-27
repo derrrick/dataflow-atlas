@@ -76,19 +76,28 @@ export default function Home() {
             collapsedContent={
               <>
                 <div style={{
-                  maxWidth: '1536px',
-                  margin: '0 auto',
-                  padding: '24px'
+                  backgroundColor: '#0A0F16', // Land mass color - same as header
+                  width: '100%'
                 }}>
-                  <AnalyticalStrip />
+                  <div style={{
+                    maxWidth: '1536px',
+                    margin: '0 auto',
+                    padding: '24px'
+                  }}>
+                    <AnalyticalStrip />
+                  </div>
                 </div>
 
                 <div style={{
+                  backgroundColor: '#080D12', // Slightly darker than header/land mass
                   borderTop: '1px solid #242C3A',
-                  padding: '12px 24px',
-                  maxWidth: '1536px',
-                  margin: '0 auto'
+                  width: '100%'
                 }}>
+                  <div style={{
+                    maxWidth: '1536px',
+                    margin: '0 auto',
+                    padding: '12px 24px'
+                  }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -99,7 +108,7 @@ export default function Home() {
                     color: '#5E6A81'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                      <span>Sources: USGS, NASA FIRMS, AirNow</span>
+                      <span>Sources: USGS, NASA FIRMS, AirNow, EIA, NOAA NWS</span>
                       <span style={{ color: '#242C3A' }}>•</span>
                       <span>License: Open Data</span>
                     </div>
@@ -110,6 +119,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </div>
               </>
             }
             expandedContent={<ChartGrid showFilters={true} />}

@@ -52,7 +52,7 @@ export default function TestChartsPage() {
   const data = getData()
 
   const getAttribution = () => {
-    const dataType = data[0]?.dataType || 'earthquake'
+    const dataType = data[0]?.layerType || 'earthquake'
 
     switch (dataType) {
       case 'earthquake':
@@ -86,7 +86,7 @@ export default function TestChartsPage() {
   }
 
   const getInfoText = (chartType: string) => {
-    const dataType = data[0]?.dataType || 'earthquake'
+    const dataType = data[0]?.layerType || 'earthquake'
 
     if (chartType === 'sparkline') {
       if (dataType === 'earthquake') return 'Four stacked sparklines showing seismic activity trends: magnitude intensity, depth underground, significance scores, and event frequency per hour over the last 24 hours.'
@@ -243,7 +243,7 @@ export default function TestChartsPage() {
           color: '#8F9BB0'
         }}>
           <strong style={{ color: '#C6CFDA' }}>Data Points:</strong> {data.length} |
-          <strong style={{ color: '#C6CFDA', marginLeft: '16px' }}>Type:</strong> {data[0]?.dataType || 'N/A'}
+          <strong style={{ color: '#C6CFDA', marginLeft: '16px' }}>Type:</strong> {data[0]?.layerType || 'N/A'}
         </div>
       </div>
 
@@ -298,9 +298,9 @@ export default function TestChartsPage() {
           <ChartHeader title="06 - Event Distribution" infoKey="small-multiples" />
           <div style={{ width: '100%', height: '180px' }}>
             <SmallMultiples
-              earthquakes={data.filter(d => d.dataType === 'earthquake')}
-              wildfires={data.filter(d => d.dataType === 'wildfire')}
-              airQuality={data.filter(d => d.dataType === 'air_quality')}
+              earthquakes={data.filter(d => d.layerType === 'earthquake')}
+              wildfires={data.filter(d => d.layerType === 'wildfire')}
+              airQuality={data.filter(d => d.layerType === 'air_quality')}
               width={400}
               height={180}
             />

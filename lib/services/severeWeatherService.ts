@@ -1,0 +1,45 @@
+import { formatRelativeTime } from './apiClient'
+import type { SevereWeather, DataServiceResponse } from './dataTypes'
+import { getEventsByType } from '@/lib/supabase'
+
+export async function fetchSevereWeather(): Promise<DataServiceResponse<SevereWeather>> {
+  try {
+    // Fetch real severe weather data from Supabase
+    const events = await getEventsByType('severe_weather')
+
+    const weather: SevereWeather[] = events
+      .map(event => {
+        return {
+          id: event.id,
+          coords: [event.location.lat, event.location.lon] as [number, number],
+          event: event.metadata?.event || 'Weather Alert',
+          severity: event.metadata?.severity || 'Unknown',
+          urgency: event.metadata?.urgency || 'Unknown',
+          headline: event.metadata?.headline || event.metadata?.event || 'Weather Alert',
+          location: event.metadata?.areaDesc || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
+          time: formatRelativeTime(event.timestamp),
+          timestamp: event.timestamp,
+          expires: event.metadata?.expires || new Date(event.timestamp + 3600000).toISOString(),
+        }
+      })
+      .slice(0, 20) // Limit to 20 most recent
+
+    console.log(`✅ Fetched ${weather.length} real severe weather alerts from Supabase`)
+
+    return {
+      data: weather,
+      timestamp: Date.now(),
+      cached: false,
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.warn('⚠️ Supabase unavailable. Returning empty data.')
+
+    return {
+      data: [],
+      error: errorMessage,
+      timestamp: Date.now(),
+      cached: false,
+    }
+  }
+}

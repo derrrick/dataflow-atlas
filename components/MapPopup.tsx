@@ -1,7 +1,7 @@
 'use client'
 
 interface MapPopupProps {
-  type: 'earthquake' | 'hazard' | 'outage' | 'latency'
+  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather'
   data: {
     location?: string
     magnitude?: number
@@ -11,6 +11,12 @@ interface MapPopupProps {
     affected?: number
     latency?: number
     region?: string
+    customers_out?: number
+    percentage_out?: number
+    state?: string
+    event?: string
+    urgency?: string
+    headline?: string
   }
 }
 
@@ -19,6 +25,8 @@ const typeColors = {
   hazard: '#FFB341',
   outage: '#5E6A81',
   latency: '#39D0FF',
+  powerOutage: '#FFD700',
+  severeWeather: '#9333EA',
 }
 
 const typeLabels = {
@@ -26,6 +34,8 @@ const typeLabels = {
   hazard: 'Hazard',
   outage: 'Outage',
   latency: 'Latency',
+  powerOutage: 'Power Outage',
+  severeWeather: 'Severe Weather',
 }
 
 export default function MapPopup({ type, data }: MapPopupProps) {
@@ -115,6 +125,60 @@ export default function MapPopup({ type, data }: MapPopupProps) {
           <div style="margin-bottom: 8px;">
             <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Region</span>
             <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.region}</div>
+          </div>
+        ` : ''}
+      ` : ''}
+
+      ${type === 'powerOutage' ? `
+        ${data.customers_out ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Customers Out</span>
+            <div style="font-size: 18px; font-weight: 600; color: #FFD700; font-family: Geist Mono, monospace;">${data.customers_out.toLocaleString()}</div>
+          </div>
+        ` : ''}
+        ${data.percentage_out !== undefined ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Percentage</span>
+            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.percentage_out}%</div>
+          </div>
+        ` : ''}
+        ${data.severity ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Severity</span>
+            <div style="font-size: 14px; color: #FFD700; font-weight: 600; font-family: Geist Mono, monospace;">${data.severity}</div>
+          </div>
+        ` : ''}
+        ${data.state ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">State</span>
+            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.state}</div>
+          </div>
+        ` : ''}
+      ` : ''}
+
+      ${type === 'severeWeather' ? `
+        ${data.event ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Event</span>
+            <div style="font-size: 16px; font-weight: 600; color: #9333EA; font-family: Geist Mono, monospace;">${data.event}</div>
+          </div>
+        ` : ''}
+        ${data.severity ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Severity</span>
+            <div style="font-size: 14px; color: #9333EA; font-weight: 600; font-family: Geist Mono, monospace;">${data.severity}</div>
+          </div>
+        ` : ''}
+        ${data.urgency ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Urgency</span>
+            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.urgency}</div>
+          </div>
+        ` : ''}
+        ${data.headline ? `
+          <div style="margin-bottom: 8px;">
+            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Alert</span>
+            <div style="font-size: 12px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.4;">${data.headline}</div>
           </div>
         ` : ''}
       ` : ''}

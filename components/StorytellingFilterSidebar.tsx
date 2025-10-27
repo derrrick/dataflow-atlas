@@ -41,7 +41,7 @@ const storyPresets: StoryPreset[] = [
       severity: 'significant',
       narrative: 'overview',
       implemented: true,
-      dataSources: ['earthquakes', 'hazards']
+      dataSources: ['earthquakes', 'hazards', 'severe-weather', 'power-outages']
     }
   },
   {
@@ -567,7 +567,7 @@ export default function StorytellingFilterSidebar({ onFiltersChange }: Storytell
                 Data Sources
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {['earthquakes', 'hazards', 'outages', 'latency'].map(source => (
+                {['earthquakes', 'hazards', 'outages', 'latency', 'power-outages', 'severe-weather'].map(source => (
                   <Checkbox
                     key={source}
                     label={source}

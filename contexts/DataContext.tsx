@@ -7,7 +7,9 @@ import { fetchHazards } from '@/lib/services/hazardService'
 import { fetchOutages, fetchLatency } from '@/lib/services/networkService'
 import { fetchAirQuality } from '@/lib/services/airQualityService'
 import { fetchWildfires } from '@/lib/services/wildfireService'
-import type { Earthquake, Hazard, Outage, LatencyPoint, AirQuality, Wildfire } from '@/lib/services/dataTypes'
+import { fetchPowerOutages } from '@/lib/services/powerOutageService'
+import { fetchSevereWeather } from '@/lib/services/severeWeatherService'
+import type { Earthquake, Hazard, Outage, LatencyPoint, AirQuality, Wildfire, PowerOutage, SevereWeather } from '@/lib/services/dataTypes'
 
 interface DataContextType {
   earthquakes: Earthquake[]
@@ -16,6 +18,8 @@ interface DataContextType {
   latencyPoints: LatencyPoint[]
   airQuality: AirQuality[]
   wildfires: Wildfire[]
+  powerOutages: PowerOutage[]
+  severeWeather: SevereWeather[]
   isRefreshing: boolean
   lastRefresh: number
   error: string | null
@@ -30,15 +34,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [latencyPoints, setLatencyPoints] = useState<LatencyPoint[]>([])
   const [airQuality, setAirQuality] = useState<AirQuality[]>([])
   const [wildfires, setWildfires] = useState<Wildfire[]>([])
+  const [powerOutages, setPowerOutages] = useState<PowerOutage[]>([])
+  const [severeWeather, setSevereWeather] = useState<SevereWeather[]>([])
 
   const refreshData = useCallback(async () => {
-    const [eqData, hazardData, outageData, latencyData, aqData, fireData] = await Promise.all([
+    const [eqData, hazardData, outageData, latencyData, aqData, fireData, powerData, weatherData] = await Promise.all([
       fetchEarthquakes(),
       fetchHazards(),
       fetchOutages(),
       fetchLatency(),
       fetchAirQuality(),
       fetchWildfires(),
+      fetchPowerOutages(),
+      fetchSevereWeather(),
     ])
 
     setEarthquakes(eqData.data)
@@ -47,6 +55,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setLatencyPoints(latencyData.data)
     setAirQuality(aqData.data)
     setWildfires(fireData.data)
+    setPowerOutages(powerData.data)
+    setSevereWeather(weatherData.data)
   }, [])
 
   // Load data once on mount
@@ -70,6 +80,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
         latencyPoints,
         airQuality,
         wildfires,
+        powerOutages,
+        severeWeather,
         isRefreshing,
         lastRefresh,
         error,

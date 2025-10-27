@@ -93,6 +93,7 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
   const { activeLayers } = useLayer()
   const [chartsToShow, setChartsToShow] = useState(9) // Only show 9 charts initially
   const [selectedChartId, setSelectedChartId] = useState<string | null>(null)
+  const [hoveredChartId, setHoveredChartId] = useState<string | null>(null)
   const chartRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const [filters, setFilters] = useState<ChartFilters>({
     categories: [],
@@ -260,6 +261,7 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
         const gridColumnSpan = chart.gridColumn || 1
         const gridRowSpan = chart.gridRow || 1
         const chartHeight = chart.height || 400
+        const isHovered = hoveredChartId === chart.id
 
         return (
           <div
@@ -268,8 +270,10 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
               if (el) chartRefs.current.set(chart.id, el)
             }}
             onClick={() => setSelectedChartId(chart.id)}
+            onMouseEnter={() => setHoveredChartId(chart.id)}
+            onMouseLeave={() => setHoveredChartId(null)}
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: isHovered ? '#141821' : '#0A0F16',
               border: '1px solid #242C3A',
               overflow: 'hidden',
               display: 'flex',
@@ -277,18 +281,9 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
               height: `${chartHeight}px`,
               gridColumn: `span ${gridColumnSpan}`,
               gridRow: `span ${gridRowSpan}`,
-              transition: 'all 200ms ease',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)'
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'translateY(0)'
+              transition: 'background-color 200ms ease',
+              cursor: 'pointer',
+              boxShadow: isHovered ? '0 4px 12px rgba(0, 0, 0, 0.5)' : 'none'
             }}
           >
             {/* Header */}

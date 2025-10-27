@@ -80,7 +80,7 @@ export function PointMap({ data, width, height = 300, interactive = true }: Poin
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [item.longitude, item.latitude]
+            coordinates: [item.coords[1], item.coords[0]] // GeoJSON is [lon, lat], data is [lat, lon]
           },
           properties: {
             timestamp: item.timestamp,

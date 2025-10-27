@@ -18,7 +18,7 @@ export default function GlobeMapLibre() {
   const [sourcesReady, setSourcesReady] = useState(false)
   const { activeLayers } = useLayer()
 
-  const { earthquakes, hazards, outages, latencyPoints, isRefreshing, lastRefresh } = useData()
+  const { earthquakes, hazards, outages, latencyPoints, powerOutages, severeWeather, isRefreshing, lastRefresh } = useData()
 
   const handleZoomIn = () => {
     if (mapRef.current) mapRef.current.zoomIn()
@@ -111,6 +111,16 @@ export default function GlobeMapLibre() {
       })
 
       map.addSource('latency-src', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+
+      map.addSource('powerOutages-src', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+
+      map.addSource('severeWeather-src', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] }
       })
@@ -284,6 +294,100 @@ export default function GlobeMapLibre() {
         }
       })
 
+      map.addLayer({
+        id: 'powerOutages-ripple',
+        type: 'circle',
+        source: 'powerOutages-src',
+        paint: {
+          'circle-color': '#FFD700',
+          'circle-opacity': 0,
+          'circle-stroke-color': '#FFD700',
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 3,
+            3, 3,
+            4, 1.5
+          ],
+          'circle-stroke-opacity': 0,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 4,
+            3, 4,
+            4, [
+              'interpolate',
+              ['linear'],
+              ['get', 'customers_out'],
+              0, 5,
+              10000, 8,
+              50000, 12,
+              100000, 16
+            ],
+            8, [
+              '*',
+              [
+                'interpolate',
+                ['linear'],
+                ['get', 'customers_out'],
+                0, 5,
+                10000, 8,
+                50000, 12,
+                100000, 16
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
+      map.addLayer({
+        id: 'severeWeather-ripple',
+        type: 'circle',
+        source: 'severeWeather-src',
+        paint: {
+          'circle-color': '#9333EA',
+          'circle-opacity': 0,
+          'circle-stroke-color': '#9333EA',
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 3,
+            3, 3,
+            4, 1.5
+          ],
+          'circle-stroke-opacity': 0,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 4,
+            3, 4,
+            4, [
+              'case',
+              ['==', ['get', 'severity'], 'Extreme'], 14,
+              ['==', ['get', 'severity'], 'Severe'], 11,
+              ['==', ['get', 'severity'], 'Moderate'], 8,
+              6
+            ],
+            8, [
+              '*',
+              [
+                'case',
+                ['==', ['get', 'severity'], 'Extreme'], 14,
+                ['==', ['get', 'severity'], 'Severe'], 11,
+                ['==', ['get', 'severity'], 'Moderate'], 8,
+                6
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
       // Add base circle layers with zoom-responsive sizing
       map.addLayer({
         id: 'earthquakes-layer',
@@ -421,8 +525,86 @@ export default function GlobeMapLibre() {
         }
       })
 
+      map.addLayer({
+        id: 'powerOutages-layer',
+        type: 'circle',
+        source: 'powerOutages-src',
+        paint: {
+          'circle-color': '#FFD700',
+          'circle-opacity': 0.10,
+          'circle-stroke-color': '#FFD700',
+          'circle-stroke-width': 2,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 4,
+            3, 4,
+            4, [
+              'interpolate',
+              ['linear'],
+              ['get', 'customers_out'],
+              0, 5,
+              10000, 8,
+              50000, 12,
+              100000, 16
+            ],
+            8, [
+              '*',
+              [
+                'interpolate',
+                ['linear'],
+                ['get', 'customers_out'],
+                0, 5,
+                10000, 8,
+                50000, 12,
+                100000, 16
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
+      map.addLayer({
+        id: 'severeWeather-layer',
+        type: 'circle',
+        source: 'severeWeather-src',
+        paint: {
+          'circle-color': '#9333EA',
+          'circle-opacity': 0.10,
+          'circle-stroke-color': '#9333EA',
+          'circle-stroke-width': 2,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 4,
+            3, 4,
+            4, [
+              'case',
+              ['==', ['get', 'severity'], 'Extreme'], 14,
+              ['==', ['get', 'severity'], 'Severe'], 11,
+              ['==', ['get', 'severity'], 'Moderate'], 8,
+              6
+            ],
+            8, [
+              '*',
+              [
+                'case',
+                ['==', ['get', 'severity'], 'Extreme'], 14,
+                ['==', ['get', 'severity'], 'Severe'], 11,
+                ['==', ['get', 'severity'], 'Moderate'], 8,
+                6
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
       // Add click handlers for popups
-      const layers = ['earthquakes-layer', 'hazards-layer', 'outages-layer', 'latency-layer']
+      const layers = ['earthquakes-layer', 'hazards-layer', 'outages-layer', 'latency-layer', 'powerOutages-layer', 'severeWeather-layer']
 
       layers.forEach(layerId => {
         map.on('click', layerId, (e) => {
@@ -435,7 +617,7 @@ export default function GlobeMapLibre() {
             popupRef.current.remove()
           }
 
-          let popupType: 'earthquake' | 'hazard' | 'outage' | 'latency'
+          let popupType: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather'
           let popupData: any = {}
 
           if (layerId === 'earthquakes-layer') {
@@ -462,11 +644,31 @@ export default function GlobeMapLibre() {
               location: props?.location,
               time: props?.time
             }
-          } else {
+          } else if (layerId === 'latency-layer') {
             popupType = 'latency'
             popupData = {
               latency: props?.latency,
               region: props?.region,
+              location: props?.location,
+              time: props?.time
+            }
+          } else if (layerId === 'powerOutages-layer') {
+            popupType = 'powerOutage'
+            popupData = {
+              customers_out: props?.customers_out,
+              percentage_out: props?.percentage_out,
+              state: props?.state,
+              severity: props?.severity,
+              location: props?.location,
+              time: props?.time
+            }
+          } else {
+            popupType = 'severeWeather'
+            popupData = {
+              event: props?.event,
+              severity: props?.severity,
+              urgency: props?.urgency,
+              headline: props?.headline,
               location: props?.location,
               time: props?.time
             }
@@ -608,6 +810,66 @@ export default function GlobeMapLibre() {
         ])
         mapRef.current.setPaintProperty('latency-ripple', 'circle-stroke-opacity', rippleOpacity)
 
+        // Animate power outages ripple
+        mapRef.current.setPaintProperty('powerOutages-ripple', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 4 * rippleScale,
+          3, 4 * rippleScale,
+          4, [
+            'interpolate',
+            ['linear'],
+            ['get', 'customers_out'],
+            0, 5 * rippleScale,
+            10000, 8 * rippleScale,
+            50000, 12 * rippleScale,
+            100000, 16 * rippleScale
+          ],
+          8, [
+            '*',
+            [
+              'interpolate',
+              ['linear'],
+              ['get', 'customers_out'],
+              0, 5 * rippleScale,
+              10000, 8 * rippleScale,
+              50000, 12 * rippleScale,
+              100000, 16 * rippleScale
+            ],
+            1.8
+          ]
+        ])
+        mapRef.current.setPaintProperty('powerOutages-ripple', 'circle-stroke-opacity', rippleOpacity)
+
+        // Animate severe weather ripple
+        mapRef.current.setPaintProperty('severeWeather-ripple', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 4 * rippleScale,
+          3, 4 * rippleScale,
+          4, [
+            'case',
+            ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
+            ['==', ['get', 'severity'], 'Severe'], 11 * rippleScale,
+            ['==', ['get', 'severity'], 'Moderate'], 8 * rippleScale,
+            6 * rippleScale
+          ],
+          8, [
+            '*',
+            [
+              'case',
+              ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
+              ['==', ['get', 'severity'], 'Severe'], 11 * rippleScale,
+              ['==', ['get', 'severity'], 'Moderate'], 8 * rippleScale,
+              6 * rippleScale
+            ],
+            1.8
+          ]
+        ])
+        mapRef.current.setPaintProperty('severeWeather-ripple', 'circle-stroke-opacity', rippleOpacity)
+
         mapRef.current.triggerRepaint()
         animationFrameRef.current = requestAnimationFrame(animate)
       }
@@ -737,6 +999,64 @@ export default function GlobeMapLibre() {
     })
   }, [latencyPoints, sourcesReady])
 
+  // Update power outages data
+  useEffect(() => {
+    if (!mapRef.current || !sourcesReady) return
+
+    const source = mapRef.current.getSource('powerOutages-src') as maplibregl.GeoJSONSource
+    if (!source) return
+
+    const features = powerOutages.map(outage => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [outage.coords[1], outage.coords[0]]
+      },
+      properties: {
+        customers_out: outage.customers_out,
+        percentage_out: outage.percentage_out,
+        state: outage.state,
+        severity: outage.severity,
+        location: outage.location,
+        time: outage.time
+      }
+    }))
+
+    source.setData({
+      type: 'FeatureCollection',
+      features
+    })
+  }, [powerOutages, sourcesReady])
+
+  // Update severe weather data
+  useEffect(() => {
+    if (!mapRef.current || !sourcesReady) return
+
+    const source = mapRef.current.getSource('severeWeather-src') as maplibregl.GeoJSONSource
+    if (!source) return
+
+    const features = severeWeather.map(weather => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [weather.coords[1], weather.coords[0]]
+      },
+      properties: {
+        event: weather.event,
+        severity: weather.severity,
+        urgency: weather.urgency,
+        headline: weather.headline,
+        location: weather.location,
+        time: weather.time
+      }
+    }))
+
+    source.setData({
+      type: 'FeatureCollection',
+      features
+    })
+  }, [severeWeather, sourcesReady])
+
   // Handle layer visibility
   useEffect(() => {
     if (!mapRef.current || !sourcesReady) return
@@ -745,6 +1065,8 @@ export default function GlobeMapLibre() {
     const hazardsVisible = activeLayers.has('hazards') ? 'visible' : 'none'
     const outagesVisible = activeLayers.has('outages') ? 'visible' : 'none'
     const latencyVisible = activeLayers.has('latency') ? 'visible' : 'none'
+    const powerOutagesVisible = activeLayers.has('power-outages') ? 'visible' : 'none'
+    const severeWeatherVisible = activeLayers.has('severe-weather') ? 'visible' : 'none'
 
     mapRef.current.setLayoutProperty('earthquakes-layer', 'visibility', earthquakeVisible)
     mapRef.current.setLayoutProperty('earthquakes-ripple', 'visibility', earthquakeVisible)
@@ -757,6 +1079,12 @@ export default function GlobeMapLibre() {
 
     mapRef.current.setLayoutProperty('latency-layer', 'visibility', latencyVisible)
     mapRef.current.setLayoutProperty('latency-ripple', 'visibility', latencyVisible)
+
+    mapRef.current.setLayoutProperty('powerOutages-layer', 'visibility', powerOutagesVisible)
+    mapRef.current.setLayoutProperty('powerOutages-ripple', 'visibility', powerOutagesVisible)
+
+    mapRef.current.setLayoutProperty('severeWeather-layer', 'visibility', severeWeatherVisible)
+    mapRef.current.setLayoutProperty('severeWeather-ripple', 'visibility', severeWeatherVisible)
   }, [activeLayers, sourcesReady])
 
   return (
@@ -805,7 +1133,7 @@ export default function GlobeMapLibre() {
         }}>
           <p style={{
             fontSize: '14px',
-            color: '#8F9BB0',
+            color: '#141821',
             margin: 0,
             fontFamily: 'Geist Mono, monospace',
           }}>

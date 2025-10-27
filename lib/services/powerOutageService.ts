@@ -1,30 +1,32 @@
 import { formatRelativeTime } from './apiClient'
-import type { Earthquake, DataServiceResponse } from './dataTypes'
+import type { PowerOutage, DataServiceResponse } from './dataTypes'
 import { getEventsByType } from '@/lib/supabase'
 
-export async function fetchEarthquakes(): Promise<DataServiceResponse<Earthquake>> {
+export async function fetchPowerOutages(): Promise<DataServiceResponse<PowerOutage>> {
   try {
-    // Fetch real earthquake data from Supabase
-    const events = await getEventsByType('earthquake')
+    // Fetch real power outage data from Supabase
+    const events = await getEventsByType('power_outage')
 
-    const earthquakes: Earthquake[] = events
+    const outages: PowerOutage[] = events
       .map(event => {
         return {
           id: event.id,
           coords: [event.location.lat, event.location.lon] as [number, number],
-          magnitude: Math.round(event.primary_value * 10) / 10,
-          depth: Math.round(event.secondary_value || 0),
-          location: event.metadata?.place || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
+          customers_out: Math.round(event.primary_value),
+          percentage_out: Math.round((event.secondary_value || 0) * 100) / 100,
+          state: event.metadata?.state || 'Unknown',
+          location: event.metadata?.state || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
           time: formatRelativeTime(event.timestamp),
           timestamp: event.timestamp,
+          severity: event.metadata?.severity || 'Minor',
         }
       })
       .slice(0, 20) // Limit to 20 most recent
 
-    console.log(`✅ Fetched ${earthquakes.length} real earthquakes from Supabase`)
+    console.log(`✅ Fetched ${outages.length} real power outages from Supabase`)
 
     return {
-      data: earthquakes,
+      data: outages,
       timestamp: Date.now(),
       cached: false,
     }

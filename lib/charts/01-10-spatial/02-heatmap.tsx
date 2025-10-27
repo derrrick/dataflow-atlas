@@ -80,7 +80,7 @@ export function Heatmap({ data, width, height = 300, interactive = true }: Heatm
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [item.longitude, item.latitude]
+            coordinates: [item.coords[1], item.coords[0]] // GeoJSON is [lon, lat], data is [lat, lon]
           },
           properties: {
             magnitude: 'magnitude' in item ? item.magnitude : 5

@@ -22,39 +22,6 @@ interface FIRMSRecord {
   daynight: string
 }
 
-// Generate realistic demo wildfire data
-function generateDemoWildfires(): Wildfire[] {
-  const hotspots = [
-    { coords: [-33.5, 150.8] as [number, number], location: 'New South Wales, Australia', brightness: 340 },
-    { coords: [36.8, -119.7] as [number, number], location: 'California, USA', brightness: 325 },
-    { coords: [-8.5, -55.2] as [number, number], location: 'Amazon, Brazil', brightness: 315 },
-    { coords: [42.5, -122.8] as [number, number], location: 'Oregon, USA', brightness: 330 },
-    { coords: [38.5, 27.8] as [number, number], location: 'Western Turkey', brightness: 310 },
-    { coords: [40.2, -8.2] as [number, number], location: 'Central Portugal', brightness: 320 },
-    { coords: [-15.8, -47.9] as [number, number], location: 'Cerrado, Brazil', brightness: 305 },
-  ]
-
-  const now = Date.now()
-  const satellites: Wildfire['satellite'][] = ['MODIS', 'VIIRS', 'MODIS', 'VIIRS', 'MODIS', 'VIIRS', 'MODIS']
-
-  return hotspots.map((hotspot, idx) => {
-    const hoursAgo = idx * 2 + Math.floor(Math.random() * 3)
-    const timestamp = now - hoursAgo * 60 * 60 * 1000
-
-    return {
-      id: `demo-fire-${idx}`,
-      coords: hotspot.coords,
-      brightness: hotspot.brightness + Math.floor(Math.random() * 20) - 10,
-      confidence: 70 + Math.floor(Math.random() * 30), // 70-100
-      scan: 0.5 + Math.random() * 1.5, // 0.5-2.0 degrees
-      location: hotspot.location,
-      time: formatRelativeTime(timestamp),
-      timestamp,
-      satellite: satellites[idx],
-    }
-  })
-}
-
 // Parse CSV data from FIRMS
 function parseFIRMSCSV(csvText: string): FIRMSRecord[] {
   const lines = csvText.trim().split('\n')
@@ -113,14 +80,14 @@ export async function fetchWildfires(apiKey?: string): Promise<DataServiceRespon
     console.log(`✅ Fetched ${wildfires.length} real wildfire detections from Supabase`)
 
     return {
-      data: wildfires.length > 0 ? wildfires : generateDemoWildfires(),
+      data: wildfires,
       timestamp: Date.now(),
       cached: false,
     }
   } catch (error) {
-    console.warn('⚠️ Supabase unavailable. Using demo wildfire data.')
+    console.warn('⚠️ Supabase unavailable. Returning empty data.')
     return {
-      data: generateDemoWildfires(),
+      data: [],
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now(),
       cached: false,
