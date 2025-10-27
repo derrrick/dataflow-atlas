@@ -9,6 +9,7 @@ import AnalyticalStrip from '@/components/AnalyticalStrip'
 import Header from '@/components/Header'
 import ExpandablePanel from '@/components/ExpandablePanel'
 import ChartGrid from '@/components/ChartGrid'
+import DataStatusBanner from '@/components/DataStatusBanner'
 
 const Globe = dynamic(() => import('@/components/GlobeMapLibre'), {
   ssr: false,
@@ -39,6 +40,7 @@ export default function Home() {
           backgroundColor: '#141821'
         }}>
           <Header />
+          <DataStatusBanner />
 
           <div style={{
             flex: 1,
