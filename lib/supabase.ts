@@ -134,3 +134,28 @@ export async function getEventsByTimeRange(
 
   return data || []
 }
+
+/**
+ * Get recent events by type (last 72 hours)
+ */
+export async function getRecentEventsByType(
+  dataType: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather',
+  hoursBack: number = 72
+): Promise<UnifiedEvent[]> {
+  const now = Date.now()
+  const startTime = now - (hoursBack * 60 * 60 * 1000)
+
+  const { data, error } = await supabase
+    .from('unified_events')
+    .select('*')
+    .eq('data_type', dataType)
+    .gte('timestamp', startTime)
+    .order('timestamp', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching recent events by type:', error)
+    return []
+  }
+
+  return data || []
+}

@@ -1,6 +1,6 @@
 import { formatRelativeTime } from './apiClient'
 import type { AirQuality, DataServiceResponse } from './dataTypes'
-import { getEventsByType } from '@/lib/supabase'
+import { getRecentEventsByType } from '@/lib/supabase'
 
 // Calculate AQI from PM2.5 concentration
 function calculateAQI(pm25: number): number {
@@ -25,8 +25,8 @@ function getQualityCategory(aqi: number): AirQuality['quality'] {
 
 export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>> {
   try {
-    // Fetch real air quality data from Supabase
-    const events = await getEventsByType('air_quality')
+    // Fetch real air quality data from Supabase (last 72 hours)
+    const events = await getRecentEventsByType('air_quality', 72)
 
     const airQuality: AirQuality[] = events
       .map(event => {

@@ -1,6 +1,6 @@
 import { formatRelativeTime } from './apiClient'
 import type { Wildfire, DataServiceResponse } from './dataTypes'
-import { getEventsByType } from '@/lib/supabase'
+import { getRecentEventsByType } from '@/lib/supabase'
 
 // NASA FIRMS API - requires API key (get from https://firms.modaps.eosdis.nasa.gov/api/area/)
 // For now, we'll use demo data and can add the API key later
@@ -55,8 +55,8 @@ function parseFIRMSCSV(csvText: string): FIRMSRecord[] {
 
 export async function fetchWildfires(apiKey?: string): Promise<DataServiceResponse<Wildfire>> {
   try {
-    // Fetch real wildfire data from Supabase
-    const events = await getEventsByType('wildfire')
+    // Fetch real wildfire data from Supabase (last 72 hours)
+    const events = await getRecentEventsByType('wildfire', 72)
 
     const wildfires: Wildfire[] = events
       .map(event => {

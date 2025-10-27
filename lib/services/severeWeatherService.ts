@@ -1,11 +1,11 @@
 import { formatRelativeTime } from './apiClient'
 import type { SevereWeather, DataServiceResponse } from './dataTypes'
-import { getEventsByType } from '@/lib/supabase'
+import { getRecentEventsByType } from '@/lib/supabase'
 
 export async function fetchSevereWeather(): Promise<DataServiceResponse<SevereWeather>> {
   try {
-    // Fetch real severe weather data from Supabase
-    const events = await getEventsByType('severe_weather')
+    // Fetch real severe weather data from Supabase (last 72 hours)
+    const events = await getRecentEventsByType('severe_weather', 72)
 
     const weather: SevereWeather[] = events
       .map(event => {
