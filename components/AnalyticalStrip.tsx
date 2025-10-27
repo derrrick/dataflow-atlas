@@ -96,13 +96,13 @@ export default function AnalyticalStrip() {
     minWidth: '280px',
     backgroundColor: hoveredTile === tileId ? '#141821' : '#0A0F16', // Ocean color on hover, land mass normally
     border: '1px solid #242C3A',
-    padding: '16px',
+    padding: '0',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column' as const,
     transition: 'background-color 200ms ease',
     cursor: 'pointer',
-    boxShadow: hoveredTile === tileId ? '0 4px 12px rgba(0, 0, 0, 0.5)' : 'none'
+    boxShadow: hoveredTile === tileId ? '0 4px 12px rgba(0, 0, 0, 0.5)' : 'none',
+    overflow: 'hidden'
   })
 
   // Chart metadata for modal
@@ -224,13 +224,32 @@ export default function AnalyticalStrip() {
   ]
 
   // Select top 4 charts with data, prioritized by data count and type
+  // Group by chart type to avoid duplicates (e.g., multiple sparklines)
   const selectedCharts = availableCharts
     .filter(chart => chart.hasData)
     .sort((a, b) => b.priority - a.priority)
+    .reduce((acc, chart) => {
+      // Extract chart type from ID (e.g., 'sparkline', 'slopegraph', 'small-multiples', 'timeseries')
+      const chartType = chart.id.split('-')[0]
+
+      // Only add if we don't already have this chart type OR if it's a significantly better data source
+      const existingOfType = acc.find(c => c.id.split('-')[0] === chartType)
+      if (!existingOfType || chart.priority > existingOfType.priority * 1.5) {
+        // Replace if significantly better, otherwise skip
+        if (existingOfType && chart.priority > existingOfType.priority * 1.5) {
+          const index = acc.indexOf(existingOfType)
+          acc[index] = chart
+        } else if (!existingOfType) {
+          acc.push(chart)
+        }
+      }
+      return acc
+    }, [] as typeof availableCharts)
     .slice(0, 4)
 
-  // If we have fewer than 4 charts with data, show what we have
-  const chartsToShow = selectedCharts.length > 0 ? selectedCharts : availableCharts.slice(0, 4)
+  // If we have fewer than 4 charts with data, fill with best available
+  const chartsToShow = selectedCharts.length >= 3 ? selectedCharts :
+    availableCharts.filter(c => c.hasData).slice(0, 4)
 
   return (
     <>
@@ -244,7 +263,42 @@ export default function AnalyticalStrip() {
               onMouseEnter={() => setHoveredTile(chart.id)}
               onMouseLeave={() => setHoveredTile(null)}
             >
-              {chart.component}
+              {/* Chart Header */}
+              <div style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid #242C3A',
+                backgroundColor: '#080D12'
+              }}>
+                <div style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#8F9BB0',
+                  fontFamily: 'Geist Mono, monospace',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  marginBottom: '4px'
+                }}>
+                  {chart.name}
+                </div>
+                <div style={{
+                  fontSize: '10px',
+                  color: '#5E6A81',
+                  fontFamily: 'Geist Mono, monospace'
+                }}>
+                  {chart.dataCount} event{chart.dataCount !== 1 ? 's' : ''}
+                </div>
+              </div>
+
+              {/* Chart Content */}
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px'
+              }}>
+                {chart.component}
+              </div>
             </div>
           ))}
         </div>

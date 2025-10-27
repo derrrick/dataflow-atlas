@@ -31,7 +31,7 @@ export default function Header() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Image
-            src="/images/dataflowatlas.svg"
+            src="/images/dataflowatlas3.svg"
             alt="Atlasflow"
             width={150}
             height={26}
