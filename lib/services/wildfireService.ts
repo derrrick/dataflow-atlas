@@ -75,7 +75,6 @@ export async function fetchWildfires(apiKey?: string): Promise<DataServiceRespon
           satellite: (event.metadata?.instrument === 'VIIRS' ? 'VIIRS' : 'MODIS') as 'VIIRS' | 'MODIS',
         }
       })
-      .slice(0, 50) // Limit to 50 fire detections
 
     console.log(`✅ Fetched ${wildfires.length} real wildfire detections from Supabase`)
 

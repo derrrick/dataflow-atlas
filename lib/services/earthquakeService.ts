@@ -19,7 +19,6 @@ export async function fetchEarthquakes(): Promise<DataServiceResponse<Earthquake
           timestamp: event.timestamp,
         }
       })
-      .slice(0, 20) // Limit to 20 most recent
 
     console.log(`✅ Fetched ${earthquakes.length} real earthquakes from Supabase`)
 

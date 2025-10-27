@@ -22,7 +22,6 @@ export async function fetchSevereWeather(): Promise<DataServiceResponse<SevereWe
           expires: event.metadata?.expires || new Date(event.timestamp + 3600000).toISOString(),
         }
       })
-      .slice(0, 20) // Limit to 20 most recent
 
     console.log(`✅ Fetched ${weather.length} real severe weather alerts from Supabase`)
 

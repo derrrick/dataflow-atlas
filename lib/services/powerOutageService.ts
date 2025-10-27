@@ -21,7 +21,6 @@ export async function fetchPowerOutages(): Promise<DataServiceResponse<PowerOuta
           severity: event.metadata?.severity || 'Minor',
         }
       })
-      .slice(0, 20) // Limit to 20 most recent
 
     console.log(`✅ Fetched ${outages.length} real power outages from Supabase`)
 

@@ -46,7 +46,6 @@ export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>
           timestamp: event.timestamp,
         }
       })
-      .slice(0, 50) // Limit to 50 stations
 
     console.log(`✅ Fetched ${airQuality.length} real air quality observations from Supabase`)
 
