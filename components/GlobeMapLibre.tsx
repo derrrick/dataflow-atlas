@@ -54,8 +54,7 @@ export default function GlobeMapLibre() {
           id: 'background',
           type: 'background',
           paint: {
-            'background-color': '#141821',
-            'background-pattern': 'ocean-texture'
+            'background-color': '#141821'
           }
         },
         {
@@ -95,23 +94,37 @@ export default function GlobeMapLibre() {
       console.log('✅ Map loaded')
 
       // Create diagonal line pattern for ocean texture
-      const canvas = document.createElement('canvas')
       const size = 24 // Pattern size (12px spacing * 2 for diagonal)
+      const canvas = document.createElement('canvas')
       canvas.width = size
       canvas.height = size
       const ctx = canvas.getContext('2d')
 
       if (ctx) {
-        ctx.strokeStyle = 'rgba(36, 44, 58, 0.15)'
+        // Clear canvas
+        ctx.clearRect(0, 0, size, size)
+
+        // Draw diagonal line
+        ctx.strokeStyle = 'rgba(36, 44, 58, 0.3)'
         ctx.lineWidth = 1
         ctx.beginPath()
         ctx.moveTo(0, size)
         ctx.lineTo(size, 0)
         ctx.stroke()
-      }
 
-      // Add pattern as image to map
-      map.addImage('ocean-texture', canvas)
+        // Get ImageData from canvas
+        const imageData = ctx.getImageData(0, 0, size, size)
+
+        // Add pattern as image to map with proper format
+        map.addImage('ocean-texture', {
+          width: size,
+          height: size,
+          data: imageData.data
+        })
+
+        // Apply pattern to background layer
+        map.setPaintProperty('background', 'background-pattern', 'ocean-texture')
+      }
 
       // Add GeoJSON sources
       map.addSource('earthquakes-src', {
