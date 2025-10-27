@@ -767,6 +767,24 @@ export default function GlobeMapLibre() {
       backgroundColor: '#141821',
       zIndex: 1
     }}>
+      {/* Ocean texture overlay - diagonal lines */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 2,
+          background: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 12px,
+            rgba(36, 44, 58, 0.15) 12px,
+            rgba(36, 44, 58, 0.15) 13px
+          )`
+        }}
+      />
       <div
         ref={mapContainer}
         style={{

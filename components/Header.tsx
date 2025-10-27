@@ -33,7 +33,7 @@ export default function Header() {
           <Image
             src="/images/dataflowatlas.svg"
             alt="Atlasflow"
-            width={180}
+            width={150}
             height={26}
             style={{ height: 'auto' }}
             priority
@@ -293,7 +293,7 @@ export default function Header() {
                   textAlign: 'center',
                 }}>
                   <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#C6CFDA' }}>
-                    <strong>Contact:</strong> <a href="mailto:contact@dataflowatlas.io" style={{ color: '#39D0FF', textDecoration: 'none' }}>contact@dataflowatlas.io</a>
+                    <strong>Contact:</strong> <a href="mailto:contact@dataflowatlas.org" style={{ color: '#39D0FF', textDecoration: 'none' }}>contact@dataflowatlas.org</a>
                   </p>
                   <p style={{ margin: '0', fontSize: '12px', color: '#8F9BB0' }}>
                     Include your organization, use case, and feature requests
