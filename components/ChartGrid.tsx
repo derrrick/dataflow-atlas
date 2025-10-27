@@ -5,7 +5,8 @@ import { useData } from '@/contexts/DataContext'
 import { useLayer } from '@/contexts/LayerContext'
 import { chartRegistry } from '@/lib/charts/registry'
 import FilterSidebar, { ChartFilters } from './FilterSidebar'
-import ChartModal from './ChartModal'
+import StorytellingFilterSidebar from './StorytellingFilterSidebar'
+import EnhancedChartModal from './EnhancedChartModal'
 import { exportChartContainer } from '@/lib/utils/chartExport'
 import { unifyAllData } from '@/lib/utils/dataNormalization'
 
@@ -84,9 +85,10 @@ const LazyChartWrapper = memo(function LazyChartWrapper({ Component, ...props }:
 
 interface ChartGridProps {
   showFilters?: boolean
+  storytellingMode?: boolean // Use narrative-focused filters instead of technical
 }
 
-export default function ChartGrid({ showFilters = false }: ChartGridProps) {
+export default function ChartGrid({ showFilters = false, storytellingMode = true }: ChartGridProps) {
   const { earthquakes, hazards, outages, latencyPoints, airQuality, wildfires } = useData()
   const { activeLayers } = useLayer()
   const [chartsToShow, setChartsToShow] = useState(9) // Only show 9 charts initially
@@ -200,7 +202,13 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
       overflow: 'hidden'
     }}>
       {/* Filter Sidebar */}
-      {showFilters && <FilterSidebar onFiltersChange={setFilters} />}
+      {showFilters && (
+        storytellingMode ? (
+          <StorytellingFilterSidebar onFiltersChange={setFilters as any} />
+        ) : (
+          <FilterSidebar onFiltersChange={setFilters} />
+        )
+      )}
 
       {/* Chart Grid */}
       <div style={{
@@ -393,7 +401,7 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
         )}
       </div>
 
-      {/* Chart Modal */}
+      {/* Enhanced Chart Modal */}
       {selectedChartId && (() => {
         const selectedChart = filteredCharts.find(c => c.id === selectedChartId)
         if (!selectedChart) return null
@@ -402,29 +410,46 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
         const currentIndex = filteredCharts.findIndex(c => c.id === selectedChartId)
 
         return (
-          <ChartModal
+          <EnhancedChartModal
             isOpen={true}
             onClose={() => setSelectedChartId(null)}
             chartId={selectedChart.number}
             chartName={selectedChart.name}
+            chartDescription={selectedChart.description}
+            category={selectedChart.category}
+            data={sampledData.unified || []}
             chartComponent={
               <Component
-                data={sampledData.earthquakes || []}
+                unified={sampledData.unified || []}
+                data={sampledData.unified || []}
                 earthquakes={sampledData.earthquakes || []}
                 hazards={sampledData.hazards || []}
                 outages={sampledData.outages || []}
                 latency={sampledData.latency || []}
+                airQuality={sampledData.airQuality || []}
+                wildfires={sampledData.wildfires || []}
                 width={1200}
                 height={700}
               />
             }
+            onNavigate={(direction) => {
+              if (direction === 'prev' && currentIndex > 0) {
+                setSelectedChartId(filteredCharts[currentIndex - 1].id)
+              } else if (direction === 'next' && currentIndex < filteredCharts.length - 1) {
+                setSelectedChartId(filteredCharts[currentIndex + 1].id)
+              }
+            }}
+            canNavigate={{
+              prev: currentIndex > 0,
+              next: currentIndex < filteredCharts.length - 1
+            }}
             onExport={(format) => {
               const chartRef = chartRefs.current.get(selectedChartId)
               if (chartRef) {
                 exportChartContainer(
                   chartRef,
                   format,
-                  sampledData.earthquakes || [], // Pass data for CSV/JSON export
+                  sampledData.unified || [],
                   `${selectedChart.number}-${selectedChart.name.toLowerCase().replace(/\s+/g, '-')}`
                 )
               }
