@@ -110,15 +110,17 @@ export function Correlation({
       (height - margin.top - margin.bottom) / variables.length
     )
 
-    const colorScale = d3.scaleSequential()
-      .domain([-1, 1])
-      .interpolator((t) => {
-        if (t < 0.5) {
-          return d3.interpolateBlues(1 - t * 2)
-        } else {
-          return d3.interpolateReds((t - 0.5) * 2)
-        }
-      })
+    // Diverging color scale: Blue (negative) → Dark Gray (zero) → Red (positive)
+    const colorScale = d3.scaleLinear<string>()
+      .domain([-1, -0.5, 0, 0.5, 1])
+      .range([
+        '#1E40AF',  // Strong negative: Dark blue
+        '#60A5FA',  // Moderate negative: Light blue
+        '#242C3A',  // Zero correlation: Dark gray (matches background)
+        '#F87171',  // Moderate positive: Light red
+        '#DC2626'   // Strong positive: Dark red
+      ])
+      .interpolate(d3.interpolateRgb)
 
     svg.selectAll('*').remove()
 
@@ -161,13 +163,19 @@ export function Correlation({
           .style('stroke', '#242C3A')
           .style('stroke-width', '0.5px')
 
-        // Correlation value
+        // Correlation value with smart text color
         svg.append('text')
           .attr('x', margin.left + j * cellSize + cellSize / 2)
           .attr('y', margin.top + i * cellSize + cellSize / 2)
           .attr('text-anchor', 'middle')
           .attr('dominant-baseline', 'middle')
-          .style('fill', Math.abs(corr) > 0.5 ? '#FFFFFF' : '#C6CFDA')
+          .style('fill', () => {
+            // Use white text on dark colors (strong correlations)
+            // Use light gray on medium/light colors (weak correlations)
+            if (Math.abs(corr) > 0.6) return '#FFFFFF'
+            if (Math.abs(corr) < 0.2) return '#C6CFDA'
+            return '#FFFFFF'
+          })
           .style('font-size', '10px')
           .style('font-family', 'Geist Mono, monospace')
           .style('font-weight', '600')
@@ -175,15 +183,86 @@ export function Correlation({
       }
     }
 
-    // Legend
+    // Color scale legend
+    const legendWidth = 200
+    const legendHeight = 12
+    const legendX = width / 2 - legendWidth / 2
+    const legendY = height - 30
+
+    // Create gradient for legend
+    const defs = svg.append('defs')
+    const gradient = defs.append('linearGradient')
+      .attr('id', 'correlation-gradient')
+      .attr('x1', '0%')
+      .attr('x2', '100%')
+
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', '#1E40AF')
+
+    gradient.append('stop')
+      .attr('offset', '25%')
+      .attr('stop-color', '#60A5FA')
+
+    gradient.append('stop')
+      .attr('offset', '50%')
+      .attr('stop-color', '#242C3A')
+
+    gradient.append('stop')
+      .attr('offset', '75%')
+      .attr('stop-color', '#F87171')
+
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', '#DC2626')
+
+    // Legend rectangle
+    svg.append('rect')
+      .attr('x', legendX)
+      .attr('y', legendY)
+      .attr('width', legendWidth)
+      .attr('height', legendHeight)
+      .style('fill', 'url(#correlation-gradient)')
+      .style('stroke', '#242C3A')
+      .style('stroke-width', '1px')
+
+    // Legend labels
     svg.append('text')
-      .attr('x', width / 2)
-      .attr('y', height - 8)
+      .attr('x', legendX)
+      .attr('y', legendY + legendHeight + 12)
+      .attr('text-anchor', 'start')
+      .style('fill', '#8F9BB0')
+      .style('font-size', '9px')
+      .style('font-family', 'Geist Mono, monospace')
+      .text('-1')
+
+    svg.append('text')
+      .attr('x', legendX + legendWidth / 2)
+      .attr('y', legendY + legendHeight + 12)
       .attr('text-anchor', 'middle')
       .style('fill', '#8F9BB0')
       .style('font-size', '9px')
       .style('font-family', 'Geist Mono, monospace')
-      .text('Pearson correlation coefficient • -1 to +1')
+      .text('0')
+
+    svg.append('text')
+      .attr('x', legendX + legendWidth)
+      .attr('y', legendY + legendHeight + 12)
+      .attr('text-anchor', 'end')
+      .style('fill', '#8F9BB0')
+      .style('font-size', '9px')
+      .style('font-family', 'Geist Mono, monospace')
+      .text('+1')
+
+    // Legend title
+    svg.append('text')
+      .attr('x', width / 2)
+      .attr('y', legendY - 8)
+      .attr('text-anchor', 'middle')
+      .style('fill', '#8F9BB0')
+      .style('font-size', '9px')
+      .style('font-family', 'Geist Mono, monospace')
+      .text('Pearson Correlation')
 
   }, [data, unified, earthquakes, wildfires, airQuality, width, height])
 
