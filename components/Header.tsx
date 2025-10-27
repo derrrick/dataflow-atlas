@@ -15,7 +15,7 @@ export default function Header() {
     <>
     <header style={{
       width: '100%',
-      backgroundColor: '#141821',
+      backgroundColor: '#0A0F16',
       borderBottom: '1px solid #242C3A',
       position: 'sticky',
       top: 0,
