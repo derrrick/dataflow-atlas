@@ -166,7 +166,7 @@ export default function Header() {
               color: '#FFFFFF',
               margin: 0,
             }}>
-              {activeModal === 'about' && 'About Flow Atlas'}
+              {activeModal === 'about' && 'About Dataflow Atlas'}
               {activeModal === 'methods' && 'Data Methods'}
               {activeModal === 'api' && 'API Documentation'}
               {activeModal === 'access' && 'Get Access'}
@@ -193,16 +193,16 @@ export default function Header() {
             {activeModal === 'about' && (
               <>
                 <p style={{ marginBottom: '16px' }}>
-                  Flow Atlas is a live visualization of global systems—energy, data, and nature—built on open sources for public, media, and professional use.
+                  Dataflow Atlas is a real-time visualization platform tracking global environmental events through trusted open data sources. Built for researchers, journalists, emergency responders, and data analysts who need immediate access to critical environmental intelligence.
                 </p>
                 <p style={{ marginBottom: '16px' }}>
-                  For researchers, journalists, and practitioners observing infrastructure and risk, Flow Atlas presents real-time environmental and network data through a clear, disciplined interface.
+                  Our platform integrates live data from USGS (earthquakes), NASA FIRMS (wildfires), and AirNow (air quality) into a unified, interactive interface designed with Nate Silver's analytical principles: clarity, trust signals, and narrative-driven exploration.
                 </p>
-                <p style={{ marginBottom: '16px', fontStyle: 'italic', color: '#8F9BB0', fontSize: '14px' }}>
-                  The planet, in motion.
+                <p style={{ marginBottom: '16px', fontStyle: 'italic', color: '#8F9BB0', fontSize: '13px' }}>
+                  The planet, in motion—visualized with precision.
                 </p>
-                <p style={{ marginBottom: '0' }}>
-                  Data sources: USGS Earthquake API, simulated hazard models, synthetic network monitoring systems.
+                <p style={{ marginBottom: '0', fontSize: '13px' }}>
+                  <strong>Current Data Sources:</strong> USGS Earthquake API, NASA FIRMS Active Fire Data, EPA AirNow Air Quality Index
                 </p>
               </>
             )}
@@ -213,16 +213,22 @@ export default function Header() {
                   Data Collection
                 </h3>
                 <p style={{ marginBottom: '16px' }}>
-                  • <strong>Earthquakes:</strong> Real-time data from USGS (magnitude ≥4.5, last 24 hours)<br/>
-                  • <strong>Hazards:</strong> Simulated environmental threat models<br/>
-                  • <strong>Outages:</strong> Synthetic network disruption data<br/>
-                  • <strong>Latency:</strong> Simulated regional latency measurements
+                  • <strong>Earthquakes:</strong> USGS Earthquake Hazards Program API (magnitude ≥4.5, updated every 15 minutes)<br/>
+                  • <strong>Wildfires:</strong> NASA FIRMS Active Fire Data via VIIRS/MODIS satellites (near real-time, 3-hour latency)<br/>
+                  • <strong>Air Quality:</strong> EPA AirNow API for current AQI measurements (hourly updates across 2,000+ monitoring stations)
                 </p>
                 <h3 style={{ fontSize: '16px', color: '#FFFFFF', marginBottom: '12px', fontWeight: 400 }}>
-                  Visualization Techniques
+                  Visualization Philosophy
                 </h3>
-                <p style={{ marginBottom: '0' }}>
-                  We follow Edward Tufte's principles of analytical design: maximize data-ink ratio, eliminate chart junk, and present data with clarity and precision. All visualizations use D3.js for dynamic, interactive charts.
+                <p style={{ marginBottom: '12px' }}>
+                  We follow <strong>Nate Silver's analytical design principles</strong> and <strong>Edward Tufte's data visualization theory</strong>:
+                </p>
+                <p style={{ marginBottom: '0', fontSize: '13px', lineHeight: '1.7' }}>
+                  • Maximize data-ink ratio, eliminate chart junk<br/>
+                  • Show trust signals (sources, timestamps, confidence levels)<br/>
+                  • Interactive tooltips with contextual data<br/>
+                  • Storytelling-first filter design for narrative exploration<br/>
+                  • Built with D3.js for precise, dynamic visualizations
                 </p>
               </>
             )}
@@ -230,10 +236,26 @@ export default function Header() {
             {activeModal === 'api' && (
               <>
                 <p style={{ marginBottom: '16px' }}>
-                  Access Flow Atlas data programmatically through our REST API.
+                  Access real-time environmental data programmatically through our REST API. All endpoints return unified JSON structures optimized for analysis and visualization.
                 </p>
                 <h3 style={{ fontSize: '16px', color: '#FFFFFF', marginBottom: '12px', fontWeight: 400 }}>
-                  Endpoints
+                  Data Ingestion Endpoints
+                </h3>
+                <div style={{
+                  backgroundColor: '#0A0F16',
+                  border: '1px solid #242C3A',
+                  padding: '16px',
+                  marginBottom: '12px',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                }}>
+                  <p style={{ margin: '0 0 6px 0', color: '#C6CFDA' }}>GET /api/ingest/earthquakes</p>
+                  <p style={{ margin: '0 0 6px 0', color: '#C6CFDA' }}>GET /api/ingest/wildfires</p>
+                  <p style={{ margin: '0 0 6px 0', color: '#C6CFDA' }}>GET /api/ingest/air-quality</p>
+                  <p style={{ margin: '0', color: '#8F9BB0', fontSize: '11px' }}>Parameters: ?limit, ?days, ?source</p>
+                </div>
+                <h3 style={{ fontSize: '16px', color: '#FFFFFF', marginBottom: '12px', fontWeight: 400 }}>
+                  Query Endpoints
                 </h3>
                 <div style={{
                   backgroundColor: '#0A0F16',
@@ -241,15 +263,13 @@ export default function Header() {
                   padding: '16px',
                   marginBottom: '16px',
                   fontFamily: 'monospace',
-                  fontSize: '13px',
+                  fontSize: '12px',
                 }}>
-                  <p style={{ margin: '0 0 8px 0' }}>GET /api/earthquakes</p>
-                  <p style={{ margin: '0 0 8px 0' }}>GET /api/hazards</p>
-                  <p style={{ margin: '0 0 8px 0' }}>GET /api/outages</p>
-                  <p style={{ margin: '0' }}>GET /api/latency</p>
+                  <p style={{ margin: '0 0 6px 0', color: '#C6CFDA' }}>GET /api/events</p>
+                  <p style={{ margin: '0', color: '#8F9BB0', fontSize: '11px' }}>Returns all unified event data</p>
                 </div>
                 <p style={{ marginBottom: '0', fontSize: '13px', color: '#8F9BB0' }}>
-                  API access requires authentication. Contact us for API keys.
+                  <strong>Current Status:</strong> Public read access available. Write access requires authentication (coming soon).
                 </p>
               </>
             )}
@@ -257,13 +277,14 @@ export default function Header() {
             {activeModal === 'access' && (
               <>
                 <p style={{ marginBottom: '16px' }}>
-                  Flow Atlas is currently in private beta. Request access to unlock:
+                  Dataflow Atlas is currently in <strong>public beta</strong>. The platform is free to use with read-only API access. Enhanced features coming soon:
                 </p>
-                <ul style={{ marginBottom: '24px', paddingLeft: '20px' }}>
-                  <li style={{ marginBottom: '8px' }}>Full API access with authentication</li>
-                  <li style={{ marginBottom: '8px' }}>Historical data exports (CSV, JSON)</li>
-                  <li style={{ marginBottom: '8px' }}>Custom alert notifications</li>
-                  <li style={{ marginBottom: '0' }}>Priority support and feature requests</li>
+                <ul style={{ marginBottom: '24px', paddingLeft: '20px', lineHeight: '1.8' }}>
+                  <li style={{ marginBottom: '8px' }}><strong>API Authentication:</strong> Write access and custom data ingestion</li>
+                  <li style={{ marginBottom: '8px' }}><strong>Historical Exports:</strong> Download multi-year datasets (CSV, JSON, GeoJSON)</li>
+                  <li style={{ marginBottom: '8px' }}><strong>Custom Alerts:</strong> Real-time notifications for threshold events</li>
+                  <li style={{ marginBottom: '8px' }}><strong>Advanced Filtering:</strong> Multi-parameter queries and custom visualizations</li>
+                  <li style={{ marginBottom: '0' }}><strong>Embeddable Widgets:</strong> Integrate charts directly into your applications</li>
                 </ul>
                 <div style={{
                   backgroundColor: '#0A0F16',
@@ -271,11 +292,11 @@ export default function Header() {
                   padding: '16px',
                   textAlign: 'center',
                 }}>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#8F9BB0' }}>
-                    Contact: access@flowatlas.io
+                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#C6CFDA' }}>
+                    <strong>Contact:</strong> <a href="mailto:contact@dataflowatlas.io" style={{ color: '#39D0FF', textDecoration: 'none' }}>contact@dataflowatlas.io</a>
                   </p>
-                  <p style={{ margin: '0', fontSize: '13px', color: '#8F9BB0' }}>
-                    Include your organization and use case
+                  <p style={{ margin: '0', fontSize: '12px', color: '#8F9BB0' }}>
+                    Include your organization, use case, and feature requests
                   </p>
                 </div>
               </>

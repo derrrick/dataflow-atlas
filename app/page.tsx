@@ -99,11 +99,15 @@ export default function Home() {
                     color: '#5E6A81'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                      <span>Sources: USGS, Simulated Data</span>
+                      <span>Sources: USGS, NASA FIRMS, AirNow</span>
                       <span style={{ color: '#242C3A' }}>•</span>
                       <span>License: Open Data</span>
                     </div>
-                    <span style={{ color: '#8F9BB0' }}>Flow Atlas v1.0</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                      <span style={{ color: '#8F9BB0' }}>Dataflow Atlas v1.0</span>
+                      <span style={{ color: '#242C3A' }}>•</span>
+                      <span style={{ color: '#5E6A81' }}>© 2025 Derrick R. Schippert</span>
+                    </div>
                   </div>
                 </div>
               </>

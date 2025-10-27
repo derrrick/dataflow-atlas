@@ -793,9 +793,9 @@ export default function EnhancedChartModal({
                   gap: '12px',
                   flexWrap: 'wrap'
                 }}>
-                  {stats.dataTypes.map(type => (
+                  {stats.dataTypes.map((type, index) => (
                     <span
-                      key={type}
+                      key={`${type}-${index}`}
                       style={{
                         padding: '8px 16px',
                         backgroundColor: type === 'earthquake' ? '#FF3B3B15' : type === 'wildfire' ? '#FFB34115' : '#39D0FF15',
