@@ -1,30 +1,6 @@
-import { fetchWithCache, formatRelativeTime } from './apiClient'
+import { formatRelativeTime } from './apiClient'
 import type { AirQuality, DataServiceResponse } from './dataTypes'
-
-const OPENAQ_API_URL = 'https://api.openaq.org/v2/latest'
-
-interface OpenAQMeasurement {
-  parameter: string
-  value: number
-  lastUpdated: string
-  unit: string
-}
-
-interface OpenAQLocation {
-  id: number
-  name: string
-  city: string
-  country: string
-  coordinates: {
-    latitude: number
-    longitude: number
-  }
-  measurements: OpenAQMeasurement[]
-}
-
-interface OpenAQResponse {
-  results: OpenAQLocation[]
-}
+import { getEventsByType } from '@/lib/supabase'
 
 // Calculate AQI from PM2.5 concentration
 function calculateAQI(pm25: number): number {
@@ -76,67 +52,39 @@ function generateDemoAirQuality(): AirQuality[] {
 }
 
 export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>> {
-  // Get major cities worldwide
-  const params = new URLSearchParams({
-    limit: '100',
-    parameter: 'pm25',
-    sort: 'desc',
-    order_by: 'lastUpdated',
-  })
-
-  const url = `${OPENAQ_API_URL}?${params}`
-
   try {
-    const { data, cached } = await fetchWithCache<OpenAQResponse>(
-      url,
-      {
-        mode: 'cors',
-        cache: 'no-cache',
-      },
-      5 * 60 * 1000 // 5 min cache
-    )
+    // Fetch real air quality data from Supabase
+    const events = await getEventsByType('air_quality')
 
-    const airQuality: AirQuality[] = data.results
-      .filter(location => {
-        // Ensure we have valid coordinates and PM2.5 measurement
-        const pm25Measurement = location.measurements.find(m => m.parameter === 'pm25')
-        return (
-          location.coordinates &&
-          location.coordinates.latitude &&
-          location.coordinates.longitude &&
-          pm25Measurement &&
-          pm25Measurement.value !== null
-        )
-      })
-      .map((location, idx) => {
-        const pm25Measurement = location.measurements.find(m => m.parameter === 'pm25')!
-        const pm25 = Math.round(pm25Measurement.value * 10) / 10
-        const aqi = calculateAQI(pm25)
-        const timestamp = new Date(pm25Measurement.lastUpdated).getTime()
+    const airQuality: AirQuality[] = events
+      .map(event => {
+        const aqi = Math.round(event.primary_value)
+        const pm25 = event.secondary_value || null
 
         return {
-          id: `openaq-${location.id}`,
-          coords: [
-            location.coordinates.latitude,
-            location.coordinates.longitude,
-          ] as [number, number],
-          pm25,
+          id: event.id,
+          coords: [event.location.lat, event.location.lon] as [number, number],
+          pm25: pm25 ? Math.round(pm25 * 10) / 10 : undefined,
           aqi,
           quality: getQualityCategory(aqi),
-          location: `${location.city}, ${location.country}`,
-          time: formatRelativeTime(timestamp),
-          timestamp,
+          location: event.metadata?.city
+            ? `${event.metadata.city}${event.metadata.state ? ', ' + event.metadata.state : ''}`
+            : `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
+          time: formatRelativeTime(event.timestamp),
+          timestamp: event.timestamp,
         }
       })
       .slice(0, 50) // Limit to 50 stations
 
+    console.log(`✅ Fetched ${airQuality.length} real air quality observations from Supabase`)
+
     return {
       data: airQuality.length > 0 ? airQuality : generateDemoAirQuality(),
       timestamp: Date.now(),
-      cached,
+      cached: false,
     }
   } catch (error) {
-    console.warn('⚠️ OpenAQ API unavailable. Using demo data.')
+    console.warn('⚠️ Supabase unavailable. Using demo data.')
     console.warn('Error:', error)
     return {
       data: generateDemoAirQuality(),

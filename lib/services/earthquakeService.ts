@@ -1,24 +1,6 @@
-import { fetchWithCache, formatRelativeTime } from './apiClient'
+import { formatRelativeTime } from './apiClient'
 import type { Earthquake, DataServiceResponse } from './dataTypes'
-
-const USGS_API_URL = 'https://earthquake.usgs.gov/fdsnws/event/1/query'
-
-interface USGSFeature {
-  id: string
-  properties: {
-    mag: number
-    place: string
-    time: number
-    depth?: number
-  }
-  geometry: {
-    coordinates: [number, number, number] // [lon, lat, depth]
-  }
-}
-
-interface USGSResponse {
-  features: USGSFeature[]
-}
+import { getEventsByType } from '@/lib/supabase'
 
 // Generate realistic demo data with current timestamps
 function generateDemoEarthquakes(): Earthquake[] {
@@ -52,69 +34,34 @@ function generateDemoEarthquakes(): Earthquake[] {
 }
 
 export async function fetchEarthquakes(): Promise<DataServiceResponse<Earthquake>> {
-  const now = new Date()
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-
-  const params = new URLSearchParams({
-    format: 'geojson',
-    starttime: yesterday.toISOString(),
-    endtime: now.toISOString(),
-    minmagnitude: '4.5',
-    orderby: 'time',
-  })
-
-  const url = `${USGS_API_URL}?${params}`
-
   try {
-    const { data, cached } = await fetchWithCache<USGSResponse>(
-      url,
-      {
-        mode: 'cors',
-        cache: 'no-cache',
-      },
-      2 * 60 * 1000
-    ) // 2 min cache
+    // Fetch real earthquake data from Supabase
+    const events = await getEventsByType('earthquake')
 
-    const earthquakes: Earthquake[] = data.features
-      .filter(feature => {
-        // Validate data
-        return (
-          feature.geometry &&
-          feature.geometry.coordinates &&
-          feature.properties &&
-          typeof feature.properties.mag === 'number' &&
-          feature.properties.place
-        )
-      })
-      .map(feature => {
-        const [lon, lat, depth] = feature.geometry.coordinates
-        const timestamp = feature.properties.time
-
+    const earthquakes: Earthquake[] = events
+      .map(event => {
         return {
-          id: feature.id,
-          coords: [lat, lon] as [number, number],
-          magnitude: Math.round(feature.properties.mag * 10) / 10,
-          depth: Math.round(depth || 0),
-          location: feature.properties.place,
-          time: formatRelativeTime(timestamp),
-          timestamp,
+          id: event.id,
+          coords: [event.location.lat, event.location.lon] as [number, number],
+          magnitude: Math.round(event.primary_value * 10) / 10,
+          depth: Math.round(event.secondary_value || 0),
+          location: event.metadata?.place || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
+          time: formatRelativeTime(event.timestamp),
+          timestamp: event.timestamp,
         }
       })
       .slice(0, 20) // Limit to 20 most recent
 
-    console.log(`✅ Fetched ${earthquakes.length} earthquakes from USGS${cached ? ' (cached)' : ''}`)
+    console.log(`✅ Fetched ${earthquakes.length} real earthquakes from Supabase`)
 
     return {
       data: earthquakes.length > 0 ? earthquakes : generateDemoEarthquakes(),
       timestamp: Date.now(),
-      cached,
+      cached: false,
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.warn(
-      '⚠️ USGS API unavailable (CORS restriction in browser environment). Using realistic demo data.',
-      '\nNote: For production, use a server-side proxy or API route to fetch USGS data.'
-    )
+    console.warn('⚠️ Supabase unavailable. Using realistic demo data.')
 
     const demoData = generateDemoEarthquakes()
     console.log(`📊 Generated ${demoData.length} realistic earthquake simulations`)

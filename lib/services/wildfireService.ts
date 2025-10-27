@@ -1,5 +1,6 @@
-import { fetchWithCache, formatRelativeTime } from './apiClient'
+import { formatRelativeTime } from './apiClient'
 import type { Wildfire, DataServiceResponse } from './dataTypes'
+import { getEventsByType } from '@/lib/supabase'
 
 // NASA FIRMS API - requires API key (get from https://firms.modaps.eosdis.nasa.gov/api/area/)
 // For now, we'll use demo data and can add the API key later
@@ -86,71 +87,30 @@ function parseFIRMSCSV(csvText: string): FIRMSRecord[] {
 }
 
 export async function fetchWildfires(apiKey?: string): Promise<DataServiceResponse<Wildfire>> {
-  // For demo purposes, return demo data unless API key is provided
-  if (!apiKey) {
-    console.warn('⚠️ NASA FIRMS API key not configured. Using demo wildfire data.')
-    console.warn('To use live data, get an API key from: https://firms.modaps.eosdis.nasa.gov/api/')
-    return {
-      data: generateDemoWildfires(),
-      timestamp: Date.now(),
-      cached: false,
-    }
-  }
-
-  // Fetch last 24 hours of active fires worldwide using MODIS
-  const params = new URLSearchParams({
-    MAP_KEY: apiKey,
-    source: 'MODIS_NRT', // Near real-time MODIS data
-    day: '1', // Last 24 hours
-    date: new Date().toISOString().split('T')[0], // Today's date
-  })
-
-  const url = `${NASA_FIRMS_API_URL}?${params}`
-
   try {
-    const response = await fetch(url, {
-      mode: 'cors',
-      cache: 'no-cache',
-    })
+    // Fetch real wildfire data from Supabase
+    const events = await getEventsByType('wildfire')
 
-    if (!response.ok) {
-      throw new Error(`FIRMS API error: ${response.status}`)
-    }
-
-    const csvText = await response.text()
-    const records = parseFIRMSCSV(csvText)
-
-    const wildfires: Wildfire[] = records
-      .filter(record => {
-        // Filter for high-confidence detections
-        const confidence = typeof record.confidence === 'number'
-          ? record.confidence
-          : record.confidence === 'h' ? 100 : record.confidence === 'n' ? 50 : 0
-        return confidence >= 50 && record.frp > 5 // Fire radiative power > 5 MW
-      })
-      .map((record, idx) => {
-        const timestamp = new Date(`${record.acq_date}T${record.acq_time}`).getTime()
-        const confidence = typeof record.confidence === 'number'
-          ? record.confidence
-          : record.confidence === 'h' ? 100 : record.confidence === 'n' ? 50 : 0
+    const wildfires: Wildfire[] = events
+      .map(event => {
+        const brightness = event.metadata?.brightness || 300 + event.primary_value * 10
+        const confidence = event.confidence === 'high' ? 90 : event.confidence === 'medium' ? 60 : 30
 
         return {
-          id: `firms-${record.satellite}-${idx}-${timestamp}`,
-          coords: [record.latitude, record.longitude] as [number, number],
-          brightness: Math.round(record.brightness),
+          id: event.id,
+          coords: [event.location.lat, event.location.lon] as [number, number],
+          brightness: Math.round(brightness),
           confidence,
-          scan: Math.round(record.scan * 100) / 100,
-          location: `Lat: ${record.latitude.toFixed(2)}, Lon: ${record.longitude.toFixed(2)}`,
-          time: formatRelativeTime(timestamp),
-          timestamp,
-          satellite: record.satellite.includes('Aqua') || record.satellite.includes('Terra')
-            ? 'MODIS'
-            : record.satellite.includes('VIIRS')
-            ? 'VIIRS'
-            : 'Unknown',
+          scan: event.metadata?.scan_size || 1.0,
+          location: event.metadata?.name || `${event.location.lat.toFixed(2)}, ${event.location.lon.toFixed(2)}`,
+          time: formatRelativeTime(event.timestamp),
+          timestamp: event.timestamp,
+          satellite: (event.metadata?.instrument === 'VIIRS' ? 'VIIRS' : 'MODIS') as 'VIIRS' | 'MODIS',
         }
       })
-      .slice(0, 100) // Limit to 100 most recent fires
+      .slice(0, 50) // Limit to 50 fire detections
+
+    console.log(`✅ Fetched ${wildfires.length} real wildfire detections from Supabase`)
 
     return {
       data: wildfires.length > 0 ? wildfires : generateDemoWildfires(),
@@ -158,8 +118,7 @@ export async function fetchWildfires(apiKey?: string): Promise<DataServiceRespon
       cached: false,
     }
   } catch (error) {
-    console.warn('⚠️ NASA FIRMS API unavailable. Using demo data.')
-    console.warn('Error:', error)
+    console.warn('⚠️ Supabase unavailable. Using demo wildfire data.')
     return {
       data: generateDemoWildfires(),
       error: error instanceof Error ? error.message : 'Unknown error',
