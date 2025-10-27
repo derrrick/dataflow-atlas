@@ -147,8 +147,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, ['*', ['get', 'magnitude'], 5],
             8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
           ]
@@ -176,8 +176,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'case',
               ['==', ['get', 'severity'], 'High'], 12,
@@ -219,13 +219,13 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 4,
+              0, 2,
               50000, 8,
               200000, 14
             ],
@@ -235,7 +235,7 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 4,
+                0, 2,
                 50000, 8,
                 200000, 14
               ],
@@ -266,8 +266,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
@@ -315,8 +315,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
@@ -364,8 +364,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'case',
               ['==', ['get', 'severity'], 'Extreme'], 14,
@@ -402,8 +402,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, ['*', ['get', 'magnitude'], 5],
             8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
           ]
@@ -423,8 +423,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'case',
               ['==', ['get', 'severity'], 'High'], 12,
@@ -458,13 +458,13 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 4,
+              0, 2,
               50000, 8,
               200000, 14
             ],
@@ -474,7 +474,7 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 4,
+                0, 2,
                 50000, 8,
                 200000, 14
               ],
@@ -497,8 +497,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
@@ -538,8 +538,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'interpolate',
               ['linear'],
@@ -579,8 +579,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 4,
-            3, 4,
+            0, 2,
+            3, 2,
             4, [
               'case',
               ['==', ['get', 'severity'], 'Extreme'], 14,
@@ -715,20 +715,26 @@ export default function GlobeMapLibre() {
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, ['*', ['get', 'magnitude'], 5 * rippleScale],
           8, ['*', ['*', ['get', 'magnitude'], 5 * rippleScale], 1.8]
         ])
-        mapRef.current.setPaintProperty('earthquakes-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate notable earthquakes (magnitude >= 5.0)
+        mapRef.current.setPaintProperty('earthquakes-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'magnitude'], 5.0],
+          rippleOpacity,
+          0
+        ])
 
         // Animate hazards ripple
         mapRef.current.setPaintProperty('hazards-ripple', 'circle-radius', [
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, [
             'case',
             ['==', ['get', 'severity'], 'High'], 12 * rippleScale,
@@ -746,20 +752,26 @@ export default function GlobeMapLibre() {
             1.8
           ]
         ])
-        mapRef.current.setPaintProperty('hazards-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate high severity hazards
+        mapRef.current.setPaintProperty('hazards-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['==', ['get', 'severity'], 'High'],
+          rippleOpacity,
+          0
+        ])
 
         // Animate outages ripple
         mapRef.current.setPaintProperty('outages-ripple', 'circle-radius', [
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
             ['get', 'affected'],
-            0, 4 * rippleScale,
+            0, 2 * rippleScale,
             50000, 8 * rippleScale,
             200000, 14 * rippleScale
           ],
@@ -769,22 +781,28 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 4 * rippleScale,
+              0, 2 * rippleScale,
               50000, 8 * rippleScale,
               200000, 14 * rippleScale
             ],
             1.8
           ]
         ])
-        mapRef.current.setPaintProperty('outages-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate significant outages (>= 50000 affected)
+        mapRef.current.setPaintProperty('outages-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'affected'], 50000],
+          rippleOpacity,
+          0
+        ])
 
         // Animate latency ripple
         mapRef.current.setPaintProperty('latency-ripple', 'circle-radius', [
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
@@ -808,15 +826,21 @@ export default function GlobeMapLibre() {
             1.8
           ]
         ])
-        mapRef.current.setPaintProperty('latency-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate significant latency issues (>= 150ms)
+        mapRef.current.setPaintProperty('latency-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'latency'], 150],
+          rippleOpacity,
+          0
+        ])
 
         // Animate power outages ripple
         mapRef.current.setPaintProperty('powerOutages-ripple', 'circle-radius', [
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, [
             'interpolate',
             ['linear'],
@@ -840,15 +864,21 @@ export default function GlobeMapLibre() {
             1.8
           ]
         ])
-        mapRef.current.setPaintProperty('powerOutages-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate significant power outages (>= 10000 customers)
+        mapRef.current.setPaintProperty('powerOutages-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'customers_out'], 10000],
+          rippleOpacity,
+          0
+        ])
 
         // Animate severe weather ripple
         mapRef.current.setPaintProperty('severeWeather-ripple', 'circle-radius', [
           'interpolate',
           ['linear'],
           ['zoom'],
-          0, 4 * rippleScale,
-          3, 4 * rippleScale,
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
           4, [
             'case',
             ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
@@ -868,7 +898,13 @@ export default function GlobeMapLibre() {
             1.8
           ]
         ])
-        mapRef.current.setPaintProperty('severeWeather-ripple', 'circle-stroke-opacity', rippleOpacity)
+        // Only pulsate extreme or severe weather events
+        mapRef.current.setPaintProperty('severeWeather-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['in', ['get', 'severity'], ['literal', ['Extreme', 'Severe']]],
+          rippleOpacity,
+          0
+        ])
 
         mapRef.current.triggerRepaint()
         animationFrameRef.current = requestAnimationFrame(animate)
