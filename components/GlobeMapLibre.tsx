@@ -18,7 +18,7 @@ export default function GlobeMapLibre() {
   const [sourcesReady, setSourcesReady] = useState(false)
   const { activeLayers } = useLayer()
 
-  const { earthquakes, hazards, outages, latencyPoints, powerOutages, severeWeather, isRefreshing, lastRefresh } = useData()
+  const { earthquakes, hazards, outages, latencyPoints, airQuality, wildfires, powerOutages, severeWeather, isRefreshing, lastRefresh } = useData()
 
   const handleZoomIn = () => {
     if (mapRef.current) mapRef.current.zoomIn()
@@ -121,6 +121,16 @@ export default function GlobeMapLibre() {
       })
 
       map.addSource('severeWeather-src', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+
+      map.addSource('airQuality-src', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+
+      map.addSource('wildfires-src', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] }
       })
@@ -388,6 +398,84 @@ export default function GlobeMapLibre() {
         }
       })
 
+      map.addLayer({
+        id: 'airQuality-ripple',
+        type: 'circle',
+        source: 'airQuality-src',
+        paint: {
+          'circle-color': '#00E400',
+          'circle-opacity': 0,
+          'circle-stroke-color': '#00E400',
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 3,
+            3, 3,
+            4, 1.5
+          ],
+          'circle-stroke-opacity': 0,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 2,
+            3, 2,
+            4, [
+              'interpolate',
+              ['linear'],
+              ['get', 'aqi'],
+              0, 5,
+              100, 8,
+              200, 11,
+              300, 14
+            ],
+            8, [
+              '*',
+              [
+                'interpolate',
+                ['linear'],
+                ['get', 'aqi'],
+                0, 5,
+                100, 8,
+                200, 11,
+                300, 14
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
+      map.addLayer({
+        id: 'wildfires-ripple',
+        type: 'circle',
+        source: 'wildfires-src',
+        paint: {
+          'circle-color': '#FF6B35',
+          'circle-opacity': 0,
+          'circle-stroke-color': '#FF6B35',
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 3,
+            3, 3,
+            4, 1.5
+          ],
+          'circle-stroke-opacity': 0,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 2,
+            3, 2,
+            4, ['*', ['get', 'intensity'], 5],
+            8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
+          ]
+        }
+      })
+
       // Add base circle layers with zoom-responsive sizing
       map.addLayer({
         id: 'earthquakes-layer',
@@ -603,8 +691,70 @@ export default function GlobeMapLibre() {
         }
       })
 
+      map.addLayer({
+        id: 'airQuality-layer',
+        type: 'circle',
+        source: 'airQuality-src',
+        paint: {
+          'circle-color': '#00E400',
+          'circle-opacity': 0.10,
+          'circle-stroke-color': '#00E400',
+          'circle-stroke-width': 2,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 2,
+            3, 2,
+            4, [
+              'interpolate',
+              ['linear'],
+              ['get', 'aqi'],
+              0, 5,
+              100, 8,
+              200, 11,
+              300, 14
+            ],
+            8, [
+              '*',
+              [
+                'interpolate',
+                ['linear'],
+                ['get', 'aqi'],
+                0, 5,
+                100, 8,
+                200, 11,
+                300, 14
+              ],
+              1.8
+            ]
+          ]
+        }
+      })
+
+      map.addLayer({
+        id: 'wildfires-layer',
+        type: 'circle',
+        source: 'wildfires-src',
+        paint: {
+          'circle-color': '#FF6B35',
+          'circle-opacity': 0.10,
+          'circle-stroke-color': '#FF6B35',
+          'circle-stroke-width': 2,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 2,
+            3, 2,
+            4, ['*', ['get', 'intensity'], 5],
+            8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
+          ]
+        }
+      })
+
       // Add click handlers for popups
-      const layers = ['earthquakes-layer', 'hazards-layer', 'outages-layer', 'latency-layer', 'powerOutages-layer', 'severeWeather-layer']
+      const layers = ['earthquakes-layer', 'hazards-layer', 'outages-layer', 'latency-layer', 'powerOutages-layer', 'severeWeather-layer', 'airQuality-layer', 'wildfires-layer']
 
       layers.forEach(layerId => {
         map.on('click', layerId, (e) => {
@@ -906,6 +1056,62 @@ export default function GlobeMapLibre() {
           0
         ])
 
+        // Animate air quality ripple
+        mapRef.current.setPaintProperty('airQuality-ripple', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
+          4, [
+            'interpolate',
+            ['linear'],
+            ['get', 'aqi'],
+            0, 5 * rippleScale,
+            100, 8 * rippleScale,
+            200, 11 * rippleScale,
+            300, 14 * rippleScale
+          ],
+          8, [
+            '*',
+            [
+              'interpolate',
+              ['linear'],
+              ['get', 'aqi'],
+              0, 5 * rippleScale,
+              100, 8 * rippleScale,
+              200, 11 * rippleScale,
+              300, 14 * rippleScale
+            ],
+            1.8
+          ]
+        ])
+        // Only pulsate poor air quality (AQI >= 100)
+        mapRef.current.setPaintProperty('airQuality-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'aqi'], 100],
+          rippleOpacity,
+          0
+        ])
+
+        // Animate wildfires ripple
+        mapRef.current.setPaintProperty('wildfires-ripple', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 2 * rippleScale,
+          3, 2 * rippleScale,
+          4, ['*', ['get', 'intensity'], 5 * rippleScale],
+          8, ['*', ['*', ['get', 'intensity'], 5 * rippleScale], 1.8]
+        ])
+        // Only pulsate significant fires (intensity >= 5)
+        mapRef.current.setPaintProperty('wildfires-ripple', 'circle-stroke-opacity', [
+          'case',
+          ['>=', ['get', 'intensity'], 5],
+          rippleOpacity,
+          0
+        ])
+
         mapRef.current.triggerRepaint()
         animationFrameRef.current = requestAnimationFrame(animate)
       }
@@ -1093,6 +1299,62 @@ export default function GlobeMapLibre() {
     })
   }, [severeWeather, sourcesReady])
 
+  // Update air quality data
+  useEffect(() => {
+    if (!mapRef.current || !sourcesReady) return
+
+    const source = mapRef.current.getSource('airQuality-src') as maplibregl.GeoJSONSource
+    if (!source) return
+
+    const features = airQuality.map(aq => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [aq.coords[1], aq.coords[0]]
+      },
+      properties: {
+        aqi: aq.aqi,
+        pm25: aq.pm25,
+        quality: aq.quality,
+        location: aq.location,
+        time: aq.time
+      }
+    }))
+
+    source.setData({
+      type: 'FeatureCollection',
+      features
+    })
+  }, [airQuality, sourcesReady])
+
+  // Update wildfires data
+  useEffect(() => {
+    if (!mapRef.current || !sourcesReady) return
+
+    const source = mapRef.current.getSource('wildfires-src') as maplibregl.GeoJSONSource
+    if (!source) return
+
+    const features = wildfires.map(fire => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [fire.coords[1], fire.coords[0]]
+      },
+      properties: {
+        intensity: fire.intensity,
+        frp: fire.frp,
+        brightness: fire.brightness,
+        location: fire.location,
+        time: fire.time
+      }
+    }))
+
+    source.setData({
+      type: 'FeatureCollection',
+      features
+    })
+  }, [wildfires, sourcesReady])
+
   // Handle layer visibility
   useEffect(() => {
     if (!mapRef.current || !sourcesReady) return
@@ -1103,6 +1365,8 @@ export default function GlobeMapLibre() {
     const latencyVisible = activeLayers.has('latency') ? 'visible' : 'none'
     const powerOutagesVisible = activeLayers.has('power-outages') ? 'visible' : 'none'
     const severeWeatherVisible = activeLayers.has('severe-weather') ? 'visible' : 'none'
+    const airQualityVisible = activeLayers.has('air-quality') ? 'visible' : 'none'
+    const wildfiresVisible = activeLayers.has('wildfire') ? 'visible' : 'none'
 
     mapRef.current.setLayoutProperty('earthquakes-layer', 'visibility', earthquakeVisible)
     mapRef.current.setLayoutProperty('earthquakes-ripple', 'visibility', earthquakeVisible)
@@ -1121,6 +1385,12 @@ export default function GlobeMapLibre() {
 
     mapRef.current.setLayoutProperty('severeWeather-layer', 'visibility', severeWeatherVisible)
     mapRef.current.setLayoutProperty('severeWeather-ripple', 'visibility', severeWeatherVisible)
+
+    mapRef.current.setLayoutProperty('airQuality-layer', 'visibility', airQualityVisible)
+    mapRef.current.setLayoutProperty('airQuality-ripple', 'visibility', airQualityVisible)
+
+    mapRef.current.setLayoutProperty('wildfires-layer', 'visibility', wildfiresVisible)
+    mapRef.current.setLayoutProperty('wildfires-ripple', 'visibility', wildfiresVisible)
   }, [activeLayers, sourcesReady])
 
   return (
