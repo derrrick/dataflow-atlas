@@ -53,10 +53,11 @@ export async function fetchAirNowData(apiKey: string): Promise<UnifiedEvent[]> {
     return []
   }
 
-  const allObservations: AirNowObservation[] = []
+  try {
+    const allObservations: AirNowObservation[] = []
 
-  // Query multiple cities in parallel for better US coverage
-  const promises = US_CITIES.map(async city => {
+    // Query multiple cities in parallel for better US coverage
+    const promises = US_CITIES.map(async city => {
     const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${city.lat}&longitude=${city.lon}&distance=100&API_KEY=${apiKey}`
 
     try {
