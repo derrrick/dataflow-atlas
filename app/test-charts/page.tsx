@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { Info } from 'lucide-react'
 import { Sparkline } from '@/lib/charts/d3/01-sparkline'
 import { Choropleth } from '@/lib/charts/d3/02-choropleth'
+import { Slopegraph } from '@/lib/charts/d3/05-slopegraph'
+import { SmallMultiples } from '@/lib/charts/d3/06-small-multiples'
+import { TimeSeries } from '@/lib/charts/d3/07-timeseries'
 import { Bubble } from '@/lib/charts/d3/22-bubble'
 import { Waterfall } from '@/lib/charts/d3/43-waterfall'
 import { DualTimeline } from '@/lib/charts/d3/13-dual-timeline'
@@ -97,6 +100,12 @@ export default function TestChartsPage() {
       if (dataType === 'earthquake') return 'Bubble chart plotting earthquake magnitude vs depth. Each bubble size represents magnitude intensity, revealing the relationship between seismic strength and underground depth.'
       if (dataType === 'wildfire') return 'Bubble chart showing wildfire acres burned vs containment progress. Bubble size indicates fire magnitude, helping identify containment efficiency patterns.'
       if (dataType === 'air_quality') return 'Bubble chart correlating AQI levels with PM2.5 concentrations. Bubble size represents air quality severity, showing pollution distribution patterns.'
+    } else if (chartType === 'slopegraph') {
+      return 'Slopegraph showing changes between two time points across different regions or categories. Slope indicates direction and magnitude of change.'
+    } else if (chartType === 'small-multiples') {
+      return 'Event distribution bar chart showing the count of different event types (earthquakes, wildfires, air quality observations) for quick comparison.'
+    } else if (chartType === 'timeseries') {
+      return 'Time series visualization showing values over time with annotations for significant events and threshold indicators.'
     } else if (chartType === 'waterfall') {
       return 'Waterfall chart showing cumulative changes over time, with each bar representing incremental increases or decreases from the baseline.'
     } else if (chartType === 'dual-timeline') {
@@ -268,6 +277,48 @@ export default function TestChartsPage() {
           </div>
         </div>
 
+        {/* Slopegraph */}
+        <div style={{
+          backgroundColor: '#141821',
+          border: '1px solid #242C3A',
+          padding: '16px'
+        }}>
+          <ChartHeader title="05 - Slopegraph" infoKey="slopegraph" />
+          <div style={{ width: '100%', height: '180px' }}>
+            <Slopegraph unified={data} width={400} height={180} />
+          </div>
+        </div>
+
+        {/* Small Multiples */}
+        <div style={{
+          backgroundColor: '#141821',
+          border: '1px solid #242C3A',
+          padding: '16px'
+        }}>
+          <ChartHeader title="06 - Event Distribution" infoKey="small-multiples" />
+          <div style={{ width: '100%', height: '180px' }}>
+            <SmallMultiples
+              earthquakes={data.filter(d => d.dataType === 'earthquake')}
+              wildfires={data.filter(d => d.dataType === 'wildfire')}
+              airQuality={data.filter(d => d.dataType === 'air_quality')}
+              width={400}
+              height={180}
+            />
+          </div>
+        </div>
+
+        {/* Time Series */}
+        <div style={{
+          backgroundColor: '#141821',
+          border: '1px solid #242C3A',
+          padding: '16px'
+        }}>
+          <ChartHeader title="07 - Time Series" infoKey="timeseries" />
+          <div style={{ width: '100%', height: '180px' }}>
+            <TimeSeries unified={data} width={400} height={180} />
+          </div>
+        </div>
+
         {/* Bubble */}
         <div style={{
           backgroundColor: '#141821',
@@ -299,9 +350,9 @@ export default function TestChartsPage() {
           padding: '16px',
           gridColumn: 'span 2'
         }}>
-          <ChartHeader title="13 - Dual Timeline (Mixed Data)" infoKey="dual-timeline" />
+          <ChartHeader title="13 - Dual Timeline (Active Data)" infoKey="dual-timeline" />
           <div style={{ width: '100%', height: '300px' }}>
-            <DualTimeline unified={mockMixedData} width={820} height={300} />
+            <DualTimeline unified={data} width={820} height={300} />
           </div>
         </div>
 

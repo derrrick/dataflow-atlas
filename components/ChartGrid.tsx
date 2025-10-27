@@ -232,7 +232,8 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '24px',
-          padding: '32px'
+          padding: '32px',
+          gridAutoRows: 'minmax(400px, auto)'
         }}>
           {filteredCharts.length === 0 ? (
             <div style={{
@@ -248,6 +249,9 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
           ) : (
             filteredCharts.slice(0, chartsToShow).map((chart) => {
         const Component = chart.Component
+        const gridColumnSpan = chart.gridColumn || 1
+        const gridRowSpan = chart.gridRow || 1
+        const chartHeight = chart.height || 400
 
         return (
           <div
@@ -262,7 +266,9 @@ export default function ChartGrid({ showFilters = false }: ChartGridProps) {
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              height: '400px',
+              height: `${chartHeight}px`,
+              gridColumn: `span ${gridColumnSpan}`,
+              gridRow: `span ${gridRowSpan}`,
               transition: 'all 200ms ease',
               cursor: 'pointer'
             }}

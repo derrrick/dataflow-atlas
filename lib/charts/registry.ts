@@ -188,7 +188,9 @@ export const chartRegistry: ChartMetadata[] = [
     priority: 'high',
     phase: 1,
     implemented: true,
-    Component: DualTimeline
+    Component: DualTimeline,
+    gridColumn: 2, // Span 2 columns (double-wide)
+    height: 350 // Taller for better timeline visibility
   },
   {
     id: 'slopegraph',
@@ -298,7 +300,9 @@ export const chartRegistry: ChartMetadata[] = [
     priority: 'medium',
     phase: 2,
     implemented: true,
-    Component: Bubble
+    Component: Bubble,
+    gridColumn: 2, // Span 2 columns (double-wide)
+    height: 400 // Tall for better bubble chart visualization
   },
   {
     id: 'correlation-matrix',

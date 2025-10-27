@@ -43,4 +43,7 @@ export interface ChartMetadata {
   phase: number
   implemented: boolean
   Component: React.ComponentType<any>
+  gridColumn?: number // Number of columns to span (1, 2, 3)
+  gridRow?: number // Number of rows to span (1, 2)
+  height?: number // Custom height in pixels
 }
