@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
 
     // Run all ingestion jobs in parallel
     const [earthquakeRes, airQualityRes, wildfireRes] = await Promise.allSettled([
-      // Earthquakes: Every 5 minutes (USGS updates constantly)
-      fetch(`${baseUrl}/api/ingest/earthquakes?timeframe=day&magnitude=all`, {
+      // Earthquakes: Fetch 7-day window for better global coverage (service layer filters to 72h)
+      fetch(`${baseUrl}/api/ingest/earthquakes?timeframe=week&magnitude=all`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       }),
