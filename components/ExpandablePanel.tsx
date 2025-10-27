@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, ReactNode } from 'react'
-import { ChevronUp, ChevronDown } from 'lucide-react'
+import { ChevronUp, ChevronDown, BookOpen } from 'lucide-react'
 
 interface ExpandablePanelProps {
   collapsedContent: ReactNode
@@ -28,7 +28,7 @@ export default function ExpandablePanel({ collapsedContent, expandedContent }: E
       overflow: isExpanded ? 'hidden' : 'visible',
       zIndex: isExpanded ? 1000 : 'auto'
     }}>
-      {/* Toggle Arrow - Top Center */}
+      {/* Toggle CTA - Top Center */}
       <div style={{
         position: isExpanded ? 'fixed' : 'absolute',
         top: isExpanded ? '44px' : '-16px',
@@ -39,29 +39,46 @@ export default function ExpandablePanel({ collapsedContent, expandedContent }: E
         <button
           onClick={toggleExpanded}
           style={{
-            width: '32px',
             height: '32px',
+            padding: '0 16px',
             border: '1px solid #242C3A',
             backgroundColor: '#141821',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: '8px',
             cursor: 'pointer',
             color: '#8F9BB0',
-            transition: 'all 200ms ease'
+            transition: 'all 200ms ease',
+            fontSize: '12px',
+            fontFamily: 'Albert Sans, sans-serif',
+            fontWeight: 500,
+            whiteSpace: 'nowrap'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#C6CFDA'
-            e.currentTarget.style.backgroundColor = '#1A202E'
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)'
+            e.currentTarget.style.color = '#FFFFFF'
+            e.currentTarget.style.backgroundColor = '#39D0FF15'
+            e.currentTarget.style.borderColor = '#39D0FF'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(57, 208, 255, 0.2)'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = '#8F9BB0'
             e.currentTarget.style.backgroundColor = '#141821'
+            e.currentTarget.style.borderColor = '#242C3A'
             e.currentTarget.style.boxShadow = 'none'
           }}
         >
-          {isExpanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+          {isExpanded ? (
+            <>
+              <ChevronDown size={14} />
+              <span>Back to Overview</span>
+            </>
+          ) : (
+            <>
+              <BookOpen size={14} />
+              <span>Explore Data Stories</span>
+              <ChevronUp size={14} />
+            </>
+          )}
         </button>
       </div>
 

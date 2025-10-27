@@ -64,8 +64,7 @@ export default function Home() {
 
             <div style={{
               position: 'absolute',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              left: '24px',
               top: '24px',
               zIndex: 100
             }}>
