@@ -54,7 +54,7 @@ export default function GlobeMapLibre() {
           id: 'background',
           type: 'background',
           paint: {
-            'background-color': 'transparent'
+            'background-color': '#141821'
           }
         },
         {
@@ -88,12 +88,6 @@ export default function GlobeMapLibre() {
       zoom: 2,
       attributionControl: false
     })
-
-    // Make the canvas transparent to show the texture behind it
-    const canvas = mapContainer.current.querySelector('canvas')
-    if (canvas) {
-      canvas.style.backgroundColor = 'transparent'
-    }
 
     mapRef.current = map
 
@@ -774,31 +768,32 @@ export default function GlobeMapLibre() {
       backgroundColor: '#141821',
       zIndex: 1
     }}>
-      {/* Ocean texture overlay - fixed pixel size at all zoom levels, behind map */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 1,
-          background: `repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 12px,
-            rgba(36, 44, 58, 0.3) 12px,
-            rgba(36, 44, 58, 0.3) 13px
-          )`
-        }}
-      />
-
       <div
         ref={mapContainer}
         style={{
           width: '100%',
           height: '100%',
           position: 'relative',
-          zIndex: 2
+          zIndex: 1
+        }}
+      />
+
+      {/* Ocean texture overlay - lines match land color, invisible over land, visible over ocean */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 2,
+          background: `repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 12px,
+            #0A0F16 12px,
+            #0A0F16 13px
+          )`
         }}
       />
 
