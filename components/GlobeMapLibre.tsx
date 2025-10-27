@@ -778,25 +778,6 @@ export default function GlobeMapLibre() {
         }}
       />
 
-      {/* Ocean texture overlay - lines match land color, invisible over land, visible over ocean */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 2,
-          background: `repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 12px,
-            #0A0F16 12px,
-            #0A0F16 13px
-          )`
-        }}
-      />
-
       <RefreshIndicator isRefreshing={isRefreshing} lastRefresh={lastRefresh} />
 
       <div style={{
