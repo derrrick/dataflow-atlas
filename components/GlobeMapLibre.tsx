@@ -89,6 +89,12 @@ export default function GlobeMapLibre() {
       attributionControl: false
     })
 
+    // Make the canvas transparent to show the texture behind it
+    const canvas = mapContainer.current.querySelector('canvas')
+    if (canvas) {
+      canvas.style.backgroundColor = 'transparent'
+    }
+
     mapRef.current = map
 
     map.on('load', () => {
