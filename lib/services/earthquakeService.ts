@@ -2,10 +2,10 @@ import { formatRelativeTime } from './apiClient'
 import type { Earthquake, DataServiceResponse } from './dataTypes'
 import { getRecentEventsByType } from '@/lib/supabase'
 
-export async function fetchEarthquakes(): Promise<DataServiceResponse<Earthquake>> {
+export async function fetchEarthquakes(t0?: number, t1?: number): Promise<DataServiceResponse<Earthquake>> {
   try {
-    // Fetch real earthquake data from Supabase (last 72 hours)
-    const events = await getRecentEventsByType('earthquake', 72)
+    // Fetch real earthquake data from Supabase
+    const events = await getRecentEventsByType('earthquake', t0 && t1 ? { t0, t1 } : { hoursBack: 12 })
 
     const earthquakes: Earthquake[] = events
       .map(event => {

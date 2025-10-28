@@ -6,7 +6,6 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useLayer } from '@/contexts/LayerContext'
 import { useData } from '@/contexts/DataContext'
 import MapPopup from './MapPopup'
-import RefreshIndicator from './RefreshIndicator'
 import ZoomControls from './ZoomControls'
 
 export default function GlobeMapLibre() {
@@ -18,7 +17,7 @@ export default function GlobeMapLibre() {
   const [sourcesReady, setSourcesReady] = useState(false)
   const { activeLayers } = useLayer()
 
-  const { earthquakes, hazards, outages, latencyPoints, airQuality, wildfires, powerOutages, severeWeather, isRefreshing, lastRefresh } = useData()
+  const { earthquakes, outages, latencyPoints, airQuality, wildfires, powerOutages, severeWeather, internetOutages, isRefreshing, lastRefresh } = useData()
 
   const handleZoomIn = () => {
     if (mapRef.current) mapRef.current.zoomIn()
@@ -43,6 +42,7 @@ export default function GlobeMapLibre() {
     const style: maplibregl.StyleSpecification = {
       version: 8,
       name: 'Flow Atlas Dark',
+      glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
       sources: {
         'openmaptiles': {
           type: 'vector',
@@ -86,7 +86,8 @@ export default function GlobeMapLibre() {
       style: style,
       center: [0, 20],
       zoom: 2,
-      attributionControl: false
+      attributionControl: false,
+      hash: true // Enable permalink support for map state (center, zoom, bearing, pitch)
     })
 
     mapRef.current = map
@@ -96,11 +97,6 @@ export default function GlobeMapLibre() {
 
       // Add GeoJSON sources
       map.addSource('earthquakes-src', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      })
-
-      map.addSource('hazards-src', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] }
       })
@@ -135,6 +131,11 @@ export default function GlobeMapLibre() {
         data: { type: 'FeatureCollection', features: [] }
       })
 
+      map.addSource('internetOutages-src', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      })
+
       // Add ripple layers (expanding beacon effect) with zoom-responsive sizing
       map.addLayer({
         id: 'earthquakes-ripple',
@@ -148,8 +149,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -159,51 +160,8 @@ export default function GlobeMapLibre() {
             ['zoom'],
             0, 1,
             3, 1,
-            4, ['*', ['get', 'magnitude'], 5],
-            8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
-          ]
-        }
-      })
-
-      map.addLayer({
-        id: 'hazards-ripple',
-        type: 'circle',
-        source: 'hazards-src',
-        paint: {
-          'circle-color': '#FFB341',
-          'circle-opacity': 0,
-          'circle-stroke-color': '#FFB341',
-          'circle-stroke-width': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 3,
-            3, 3,
-            4, 1.5
-          ],
-          'circle-stroke-opacity': 0,
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 1,
-            3, 1,
-            4, [
-              'case',
-              ['==', ['get', 'severity'], 'High'], 12,
-              ['==', ['get', 'severity'], 'Medium'], 9,
-              6
-            ],
-            8, [
-              '*',
-              [
-                'case',
-                ['==', ['get', 'severity'], 'High'], 12,
-                ['==', ['get', 'severity'], 'Medium'], 9,
-                6
-              ],
-              1.8
-            ]
+            4, ['*', ['get', 'magnitude'], 4],
+            8, ['*', ['*', ['get', 'magnitude'], 4], 2]
           ]
         }
       })
@@ -220,8 +178,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -235,9 +193,9 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 1,
-              50000, 8,
-              200000, 14
+              0, 8,
+              50000, 16,
+              200000, 24
             ],
             8, [
               '*',
@@ -245,11 +203,11 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 1,
-                50000, 8,
-                200000, 14
+                0, 8,
+                50000, 16,
+                200000, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -260,15 +218,15 @@ export default function GlobeMapLibre() {
         type: 'circle',
         source: 'latency-src',
         paint: {
-          'circle-color': '#19C6A6',
+          'circle-color': '#00E400',
           'circle-opacity': 0,
-          'circle-stroke-color': '#19C6A6',
+          'circle-stroke-color': '#00E400',
           'circle-stroke-width': [
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -282,10 +240,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'latency'],
-              0, 3,
-              100, 5,
-              300, 9,
-              500, 12
+              0, 8,
+              100, 8,
+              300, 16,
+              500, 16
             ],
             8, [
               '*',
@@ -293,12 +251,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'latency'],
-                0, 3,
-                100, 5,
-                300, 9,
-                500, 12
+                0, 8,
+                100, 8,
+                300, 16,
+                500, 16
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -316,8 +274,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -331,10 +289,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'customers_out'],
-              0, 5,
+              0, 8,
               10000, 8,
-              50000, 12,
-              100000, 16
+              50000, 16,
+              100000, 24
             ],
             8, [
               '*',
@@ -342,12 +300,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'customers_out'],
-                0, 5,
+                0, 8,
                 10000, 8,
-                50000, 12,
-                100000, 16
+                50000, 16,
+                100000, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -365,8 +323,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -378,21 +336,21 @@ export default function GlobeMapLibre() {
             3, 1,
             4, [
               'case',
-              ['==', ['get', 'severity'], 'Extreme'], 14,
-              ['==', ['get', 'severity'], 'Severe'], 11,
+              ['==', ['get', 'severity'], 'Extreme'], 24,
+              ['==', ['get', 'severity'], 'Severe'], 16,
               ['==', ['get', 'severity'], 'Moderate'], 8,
-              6
+              8
             ],
             8, [
               '*',
               [
                 'case',
-                ['==', ['get', 'severity'], 'Extreme'], 14,
-                ['==', ['get', 'severity'], 'Severe'], 11,
+                ['==', ['get', 'severity'], 'Extreme'], 24,
+                ['==', ['get', 'severity'], 'Severe'], 16,
                 ['==', ['get', 'severity'], 'Moderate'], 8,
-                6
+                8
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -403,15 +361,15 @@ export default function GlobeMapLibre() {
         type: 'circle',
         source: 'airQuality-src',
         paint: {
-          'circle-color': '#00E400',
+          'circle-color': '#19C6A6',
           'circle-opacity': 0,
-          'circle-stroke-color': '#00E400',
+          'circle-stroke-color': '#19C6A6',
           'circle-stroke-width': [
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -425,10 +383,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'aqi'],
-              0, 5,
+              0, 8,
               100, 8,
-              200, 11,
-              300, 14
+              200, 16,
+              300, 24
             ],
             8, [
               '*',
@@ -436,12 +394,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'aqi'],
-                0, 5,
+                0, 8,
                 100, 8,
-                200, 11,
-                300, 14
+                200, 16,
+                300, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -459,8 +417,8 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 3,
-            3, 3,
+            0, 2,
+            3, 2,
             4, 1.5
           ],
           'circle-stroke-opacity': 0,
@@ -470,65 +428,59 @@ export default function GlobeMapLibre() {
             ['zoom'],
             0, 1,
             3, 1,
-            4, ['*', ['get', 'intensity'], 5],
-            8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
+            4, ['*', ['get', 'intensity'], 4],
+            8, ['*', ['*', ['get', 'intensity'], 4], 2]
           ]
         }
       })
 
-      // Add base circle layers with zoom-responsive sizing
+      map.addLayer({
+        id: 'internetOutages-ripple',
+        type: 'circle',
+        source: 'internetOutages-src',
+        paint: {
+          'circle-color': '#4ECDC4',
+          'circle-opacity': 0,
+          'circle-stroke-color': '#4ECDC4',
+          'circle-stroke-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 2,
+            3, 2,
+            4, 1.5
+          ],
+          'circle-stroke-opacity': 0,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 1,
+            3, 1,
+            4, 12,
+            8, 24
+          ]
+        }
+      })
+
+      // Add base circle layers with zoom-responsive sizing (8px grid alignment)
       map.addLayer({
         id: 'earthquakes-layer',
         type: 'circle',
         source: 'earthquakes-src',
         paint: {
           'circle-color': '#FF3B3B',
-          'circle-opacity': 0.10,
+          'circle-opacity': 0.15,
           'circle-stroke-color': '#FF3B3B',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
             ['zoom'],
             0, 1,
             3, 1,
-            4, ['*', ['get', 'magnitude'], 5],
-            8, ['*', ['*', ['get', 'magnitude'], 5], 1.8]
-          ]
-        }
-      })
-
-      map.addLayer({
-        id: 'hazards-layer',
-        type: 'circle',
-        source: 'hazards-src',
-        paint: {
-          'circle-color': '#FFB341',
-          'circle-opacity': 0.10,
-          'circle-stroke-color': '#FFB341',
-          'circle-stroke-width': 2,
-          'circle-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 1,
-            3, 1,
-            4, [
-              'case',
-              ['==', ['get', 'severity'], 'High'], 12,
-              ['==', ['get', 'severity'], 'Medium'], 9,
-              6
-            ],
-            8, [
-              '*',
-              [
-                'case',
-                ['==', ['get', 'severity'], 'High'], 12,
-                ['==', ['get', 'severity'], 'Medium'], 9,
-                6
-              ],
-              1.8
-            ]
+            4, ['*', ['get', 'magnitude'], 4], // 4x base = 8px grid
+            8, ['*', ['*', ['get', 'magnitude'], 4], 2]
           ]
         }
       })
@@ -539,9 +491,9 @@ export default function GlobeMapLibre() {
         source: 'outages-src',
         paint: {
           'circle-color': '#39D0FF',
-          'circle-opacity': 0.10,
+          'circle-opacity': 0.15,
           'circle-stroke-color': '#39D0FF',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
@@ -552,9 +504,9 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 1,
-              50000, 8,
-              200000, 14
+              0, 8,
+              50000, 16,
+              200000, 24
             ],
             8, [
               '*',
@@ -562,11 +514,11 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'affected'],
-                0, 1,
-                50000, 8,
-                200000, 14
+                0, 8,
+                50000, 16,
+                200000, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -577,10 +529,10 @@ export default function GlobeMapLibre() {
         type: 'circle',
         source: 'latency-src',
         paint: {
-          'circle-color': '#19C6A6',
-          'circle-opacity': 0.10,
-          'circle-stroke-color': '#19C6A6',
-          'circle-stroke-width': 2,
+          'circle-color': '#00E400',
+          'circle-opacity': 0.15,
+          'circle-stroke-color': '#00E400',
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
@@ -591,10 +543,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'latency'],
-              0, 3,
-              100, 5,
-              300, 9,
-              500, 12
+              0, 8,
+              100, 8,
+              300, 16,
+              500, 16
             ],
             8, [
               '*',
@@ -602,12 +554,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'latency'],
-                0, 3,
-                100, 5,
-                300, 9,
-                500, 12
+                0, 8,
+                100, 8,
+                300, 16,
+                500, 16
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -619,9 +571,9 @@ export default function GlobeMapLibre() {
         source: 'powerOutages-src',
         paint: {
           'circle-color': '#FFD700',
-          'circle-opacity': 0.10,
+          'circle-opacity': 0.15,
           'circle-stroke-color': '#FFD700',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
@@ -632,10 +584,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'customers_out'],
-              0, 5,
+              0, 8,
               10000, 8,
-              50000, 12,
-              100000, 16
+              50000, 16,
+              100000, 24
             ],
             8, [
               '*',
@@ -643,12 +595,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'customers_out'],
-                0, 5,
+                0, 8,
                 10000, 8,
-                50000, 12,
-                100000, 16
+                50000, 16,
+                100000, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -660,9 +612,9 @@ export default function GlobeMapLibre() {
         source: 'severeWeather-src',
         paint: {
           'circle-color': '#9333EA',
-          'circle-opacity': 0.10,
+          'circle-opacity': 0.15,
           'circle-stroke-color': '#9333EA',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
@@ -671,35 +623,41 @@ export default function GlobeMapLibre() {
             3, 1,
             4, [
               'case',
-              ['==', ['get', 'severity'], 'Extreme'], 14,
-              ['==', ['get', 'severity'], 'Severe'], 11,
+              ['==', ['get', 'severity'], 'Extreme'], 24,
+              ['==', ['get', 'severity'], 'Severe'], 16,
               ['==', ['get', 'severity'], 'Moderate'], 8,
-              6
+              8
             ],
             8, [
               '*',
               [
                 'case',
-                ['==', ['get', 'severity'], 'Extreme'], 14,
-                ['==', ['get', 'severity'], 'Severe'], 11,
+                ['==', ['get', 'severity'], 'Extreme'], 24,
+                ['==', ['get', 'severity'], 'Severe'], 16,
                 ['==', ['get', 'severity'], 'Moderate'], 8,
-                6
+                8
               ],
-              1.8
+              2
             ]
           ]
         }
       })
+
+      // Ensure severe weather color is set to purple
+      map.setPaintProperty('severeWeather-layer', 'circle-color', '#9333EA')
+      map.setPaintProperty('severeWeather-layer', 'circle-stroke-color', '#9333EA')
+      map.setPaintProperty('severeWeather-ripple', 'circle-color', '#9333EA')
+      map.setPaintProperty('severeWeather-ripple', 'circle-stroke-color', '#9333EA')
 
       map.addLayer({
         id: 'airQuality-layer',
         type: 'circle',
         source: 'airQuality-src',
         paint: {
-          'circle-color': '#00E400',
-          'circle-opacity': 0.10,
-          'circle-stroke-color': '#00E400',
-          'circle-stroke-width': 2,
+          'circle-color': '#19C6A6',
+          'circle-opacity': 0.15,
+          'circle-stroke-color': '#19C6A6',
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
@@ -710,10 +668,10 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'aqi'],
-              0, 5,
+              0, 8,
               100, 8,
-              200, 11,
-              300, 14
+              200, 16,
+              300, 24
             ],
             8, [
               '*',
@@ -721,12 +679,12 @@ export default function GlobeMapLibre() {
                 'interpolate',
                 ['linear'],
                 ['get', 'aqi'],
-                0, 5,
+                0, 8,
                 100, 8,
-                200, 11,
-                300, 14
+                200, 16,
+                300, 24
               ],
-              1.8
+              2
             ]
           ]
         }
@@ -738,23 +696,44 @@ export default function GlobeMapLibre() {
         source: 'wildfires-src',
         paint: {
           'circle-color': '#FF6B35',
-          'circle-opacity': 0.10,
+          'circle-opacity': 0.15,
           'circle-stroke-color': '#FF6B35',
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
             ['linear'],
             ['zoom'],
             0, 1,
             3, 1,
-            4, ['*', ['get', 'intensity'], 5],
-            8, ['*', ['*', ['get', 'intensity'], 5], 1.8]
+            4, ['*', ['get', 'intensity'], 4], // 8px grid alignment
+            8, ['*', ['*', ['get', 'intensity'], 4], 2]
+          ]
+        }
+      })
+
+      map.addLayer({
+        id: 'internetOutages-layer',
+        type: 'circle',
+        source: 'internetOutages-src',
+        paint: {
+          'circle-color': '#4ECDC4',
+          'circle-opacity': 0.15,
+          'circle-stroke-color': '#4ECDC4',
+          'circle-stroke-width': 1,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 1,
+            3, 1,
+            4, 12,
+            8, 24
           ]
         }
       })
 
       // Add click handlers for popups
-      const layers = ['earthquakes-layer', 'hazards-layer', 'outages-layer', 'latency-layer', 'powerOutages-layer', 'severeWeather-layer', 'airQuality-layer', 'wildfires-layer']
+      const layers = ['earthquakes-layer', 'outages-layer', 'latency-layer', 'powerOutages-layer', 'severeWeather-layer', 'airQuality-layer', 'wildfires-layer', 'internetOutages-layer']
 
       layers.forEach(layerId => {
         map.on('click', layerId, (e) => {
@@ -767,7 +746,7 @@ export default function GlobeMapLibre() {
             popupRef.current.remove()
           }
 
-          let popupType: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather'
+          let popupType: 'earthquake' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage'
           let popupData: any = {}
 
           if (layerId === 'earthquakes-layer') {
@@ -775,14 +754,6 @@ export default function GlobeMapLibre() {
             popupData = {
               magnitude: props?.magnitude,
               depth: props?.depth,
-              location: props?.location,
-              time: props?.time
-            }
-          } else if (layerId === 'hazards-layer') {
-            popupType = 'hazard'
-            popupData = {
-              severity: props?.severity,
-              affected: props?.affected,
               location: props?.location,
               time: props?.time
             }
@@ -812,7 +783,7 @@ export default function GlobeMapLibre() {
               location: props?.location,
               time: props?.time
             }
-          } else {
+          } else if (layerId === 'severeWeather-layer') {
             popupType = 'severeWeather'
             popupData = {
               event: props?.event,
@@ -824,6 +795,35 @@ export default function GlobeMapLibre() {
               description: props?.description,
               instruction: props?.instruction,
               areaDesc: props?.areaDesc,
+              location: props?.location,
+              time: props?.time
+            }
+          } else if (layerId === 'internetOutages-layer') {
+            popupType = 'internetOutage'
+            popupData = {
+              country: props?.country,
+              description: props?.description,
+              cause: props?.cause,
+              type: props?.type,
+              isps: props?.isps ? JSON.parse(props.isps) : [],
+              location: props?.location,
+              time: props?.time
+            }
+          } else if (layerId === 'airQuality-layer') {
+            // Air quality nodes - show as outage for now
+            popupType = 'outage'
+            popupData = {
+              region: props?.quality || 'Moderate',
+              affected: 0,
+              location: props?.location,
+              time: props?.time
+            }
+          } else {
+            // Wildfires - show as outage for now
+            popupType = 'outage'
+            popupData = {
+              region: 'High Intensity',
+              affected: 0,
               location: props?.location,
               time: props?.time
             }
@@ -872,45 +872,13 @@ export default function GlobeMapLibre() {
           ['zoom'],
           0, 1 * rippleScale,
           3, 1 * rippleScale,
-          4, ['*', ['get', 'magnitude'], 5 * rippleScale],
-          8, ['*', ['*', ['get', 'magnitude'], 5 * rippleScale], 1.8]
+          4, ['*', ['get', 'magnitude'], 4 * rippleScale],
+          8, ['*', ['*', ['get', 'magnitude'], 4 * rippleScale], 2]
         ])
         // Only pulsate notable earthquakes (magnitude >= 5.0)
         mapRef.current.setPaintProperty('earthquakes-ripple', 'circle-stroke-opacity', [
           'case',
           ['>=', ['get', 'magnitude'], 5.0],
-          rippleOpacity,
-          0
-        ])
-
-        // Animate hazards ripple
-        mapRef.current.setPaintProperty('hazards-ripple', 'circle-radius', [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          0, 1 * rippleScale,
-          3, 1 * rippleScale,
-          4, [
-            'case',
-            ['==', ['get', 'severity'], 'High'], 11 * rippleScale,
-            ['==', ['get', 'severity'], 'Medium'], 9 * rippleScale,
-            6 * rippleScale
-          ],
-          8, [
-            '*',
-            [
-              'case',
-              ['==', ['get', 'severity'], 'High'], 11 * rippleScale,
-              ['==', ['get', 'severity'], 'Medium'], 9 * rippleScale,
-              6 * rippleScale
-            ],
-            1.8
-          ]
-        ])
-        // Only pulsate high severity hazards
-        mapRef.current.setPaintProperty('hazards-ripple', 'circle-stroke-opacity', [
-          'case',
-          ['==', ['get', 'severity'], 'High'],
           rippleOpacity,
           0
         ])
@@ -926,9 +894,9 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['get', 'affected'],
-            0, 1 * rippleScale,
-            50000, 8 * rippleScale,
-            200000, 14 * rippleScale
+            0, 8 * rippleScale,
+            50000, 16 * rippleScale,
+            200000, 24 * rippleScale
           ],
           8, [
             '*',
@@ -936,11 +904,11 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'affected'],
-              0, 1 * rippleScale,
-              50000, 8 * rippleScale,
-              200000, 14 * rippleScale
+              0, 8 * rippleScale,
+              50000, 16 * rippleScale,
+              200000, 24 * rippleScale
             ],
-            1.8
+            2
           ]
         ])
         // Only pulsate significant outages (>= 50000 affected)
@@ -962,10 +930,10 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['get', 'latency'],
-            0, 3 * rippleScale,
-            100, 5 * rippleScale,
-            300, 9 * rippleScale,
-            500, 11 * rippleScale
+            0, 8 * rippleScale,
+            100, 8 * rippleScale,
+            300, 16 * rippleScale,
+            500, 16 * rippleScale
           ],
           8, [
             '*',
@@ -973,12 +941,12 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'latency'],
-              0, 3 * rippleScale,
-              100, 5 * rippleScale,
-              300, 9 * rippleScale,
-              500, 11 * rippleScale
+              0, 8 * rippleScale,
+              100, 8 * rippleScale,
+              300, 16 * rippleScale,
+              500, 16 * rippleScale
             ],
-            1.8
+            2
           ]
         ])
         // Only pulsate significant latency issues (>= 150ms)
@@ -1000,10 +968,10 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['get', 'customers_out'],
-            0, 5 * rippleScale,
+            0, 8 * rippleScale,
             10000, 8 * rippleScale,
-            50000, 11 * rippleScale,
-            100000, 16 * rippleScale
+            50000, 16 * rippleScale,
+            100000, 24 * rippleScale
           ],
           8, [
             '*',
@@ -1011,12 +979,12 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'customers_out'],
-              0, 5 * rippleScale,
+              0, 8 * rippleScale,
               10000, 8 * rippleScale,
-              50000, 11 * rippleScale,
-              100000, 16 * rippleScale
+              50000, 16 * rippleScale,
+              100000, 24 * rippleScale
             ],
-            1.8
+            2
           ]
         ])
         // Only pulsate significant power outages (>= 10000 customers)
@@ -1036,21 +1004,21 @@ export default function GlobeMapLibre() {
           3, 1 * rippleScale,
           4, [
             'case',
-            ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
-            ['==', ['get', 'severity'], 'Severe'], 11 * rippleScale,
+            ['==', ['get', 'severity'], 'Extreme'], 24 * rippleScale,
+            ['==', ['get', 'severity'], 'Severe'], 16 * rippleScale,
             ['==', ['get', 'severity'], 'Moderate'], 8 * rippleScale,
-            6 * rippleScale
+            8 * rippleScale
           ],
           8, [
             '*',
             [
               'case',
-              ['==', ['get', 'severity'], 'Extreme'], 14 * rippleScale,
-              ['==', ['get', 'severity'], 'Severe'], 11 * rippleScale,
+              ['==', ['get', 'severity'], 'Extreme'], 24 * rippleScale,
+              ['==', ['get', 'severity'], 'Severe'], 16 * rippleScale,
               ['==', ['get', 'severity'], 'Moderate'], 8 * rippleScale,
-              6 * rippleScale
+              8 * rippleScale
             ],
-            1.8
+            2
           ]
         ])
         // Only pulsate extreme or severe weather events
@@ -1072,10 +1040,10 @@ export default function GlobeMapLibre() {
             'interpolate',
             ['linear'],
             ['get', 'aqi'],
-            0, 5 * rippleScale,
+            0, 8 * rippleScale,
             100, 8 * rippleScale,
-            200, 11 * rippleScale,
-            300, 14 * rippleScale
+            200, 16 * rippleScale,
+            300, 24 * rippleScale
           ],
           8, [
             '*',
@@ -1083,12 +1051,12 @@ export default function GlobeMapLibre() {
               'interpolate',
               ['linear'],
               ['get', 'aqi'],
-              0, 5 * rippleScale,
+              0, 8 * rippleScale,
               100, 8 * rippleScale,
-              200, 11 * rippleScale,
-              300, 14 * rippleScale
+              200, 16 * rippleScale,
+              300, 24 * rippleScale
             ],
-            1.8
+            2
           ]
         ])
         // Only pulsate poor air quality (AQI >= 100)
@@ -1106,8 +1074,8 @@ export default function GlobeMapLibre() {
           ['zoom'],
           0, 1 * rippleScale,
           3, 1 * rippleScale,
-          4, ['*', ['get', 'intensity'], 5 * rippleScale],
-          8, ['*', ['*', ['get', 'intensity'], 5 * rippleScale], 1.8]
+          4, ['*', ['get', 'intensity'], 4 * rippleScale],
+          8, ['*', ['*', ['get', 'intensity'], 4 * rippleScale], 2]
         ])
         // Only pulsate significant fires (intensity >= 5)
         mapRef.current.setPaintProperty('wildfires-ripple', 'circle-stroke-opacity', [
@@ -1116,6 +1084,19 @@ export default function GlobeMapLibre() {
           rippleOpacity,
           0
         ])
+
+        // Animate internet outages ripple
+        mapRef.current.setPaintProperty('internetOutages-ripple', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 1 * rippleScale,
+          3, 1 * rippleScale,
+          4, 12 * rippleScale,
+          8, 24 * rippleScale
+        ])
+        // Pulsate all internet outages
+        mapRef.current.setPaintProperty('internetOutages-ripple', 'circle-stroke-opacity', rippleOpacity)
 
         mapRef.current.triggerRepaint()
         animationFrameRef.current = requestAnimationFrame(animate)
@@ -1164,33 +1145,6 @@ export default function GlobeMapLibre() {
       features
     })
   }, [earthquakes, sourcesReady])
-
-  // Update hazard data
-  useEffect(() => {
-    if (!mapRef.current || !sourcesReady) return
-
-    const source = mapRef.current.getSource('hazards-src') as maplibregl.GeoJSONSource
-    if (!source) return
-
-    const features = hazards.map(hazard => ({
-      type: 'Feature' as const,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [hazard.coords[1], hazard.coords[0]]
-      },
-      properties: {
-        severity: hazard.severity,
-        affected: hazard.affected,
-        location: hazard.location,
-        time: hazard.time
-      }
-    }))
-
-    source.setData({
-      type: 'FeatureCollection',
-      features
-    })
-  }, [hazards, sourcesReady])
 
   // Update outage data
   useEffect(() => {
@@ -1365,24 +1319,53 @@ export default function GlobeMapLibre() {
     })
   }, [wildfires, sourcesReady])
 
+  // Update internet outages data
+  useEffect(() => {
+    if (!mapRef.current || !sourcesReady) return
+
+    const source = mapRef.current.getSource('internetOutages-src') as maplibregl.GeoJSONSource
+    if (!source) return
+
+    const features = internetOutages.map(outage => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [outage.coords[1], outage.coords[0]]
+      },
+      properties: {
+        country: outage.country,
+        description: outage.description,
+        cause: outage.cause,
+        type: outage.type,
+        isps: JSON.stringify(outage.isps),
+        location: outage.location,
+        time: outage.time
+      }
+    }))
+
+    console.log(`🗺️ Adding ${features.length} internet outage markers to map`)
+
+    source.setData({
+      type: 'FeatureCollection',
+      features
+    })
+  }, [internetOutages, sourcesReady])
+
   // Handle layer visibility
   useEffect(() => {
     if (!mapRef.current || !sourcesReady) return
 
     const earthquakeVisible = activeLayers.has('earthquakes') ? 'visible' : 'none'
-    const hazardsVisible = activeLayers.has('hazards') ? 'visible' : 'none'
     const outagesVisible = activeLayers.has('outages') ? 'visible' : 'none'
     const latencyVisible = activeLayers.has('latency') ? 'visible' : 'none'
     const powerOutagesVisible = activeLayers.has('power-outages') ? 'visible' : 'none'
     const severeWeatherVisible = activeLayers.has('severe-weather') ? 'visible' : 'none'
     const airQualityVisible = activeLayers.has('air-quality') ? 'visible' : 'none'
     const wildfiresVisible = activeLayers.has('wildfire') ? 'visible' : 'none'
+    const internetOutagesVisible = activeLayers.has('internet-outages') ? 'visible' : 'none'
 
     mapRef.current.setLayoutProperty('earthquakes-layer', 'visibility', earthquakeVisible)
     mapRef.current.setLayoutProperty('earthquakes-ripple', 'visibility', earthquakeVisible)
-
-    mapRef.current.setLayoutProperty('hazards-layer', 'visibility', hazardsVisible)
-    mapRef.current.setLayoutProperty('hazards-ripple', 'visibility', hazardsVisible)
 
     mapRef.current.setLayoutProperty('outages-layer', 'visibility', outagesVisible)
     mapRef.current.setLayoutProperty('outages-ripple', 'visibility', outagesVisible)
@@ -1401,6 +1384,9 @@ export default function GlobeMapLibre() {
 
     mapRef.current.setLayoutProperty('wildfires-layer', 'visibility', wildfiresVisible)
     mapRef.current.setLayoutProperty('wildfires-ripple', 'visibility', wildfiresVisible)
+
+    mapRef.current.setLayoutProperty('internetOutages-layer', 'visibility', internetOutagesVisible)
+    mapRef.current.setLayoutProperty('internetOutages-ripple', 'visibility', internetOutagesVisible)
   }, [activeLayers, sourcesReady])
 
   return (
@@ -1421,8 +1407,6 @@ export default function GlobeMapLibre() {
           zIndex: 1
         }}
       />
-
-      <RefreshIndicator isRefreshing={isRefreshing} lastRefresh={lastRefresh} />
 
       <div style={{
         position: 'absolute',

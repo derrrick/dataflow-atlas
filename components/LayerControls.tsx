@@ -34,7 +34,7 @@ const categories: CategoryConfig[] = [
       { id: 'ocean-temp', label: 'Ocean Temperature', color: '#16A085', updateFrequency: '6 hr – Daily' },
       { id: 'earthquakes', label: 'Earthquakes / Seismic', color: '#FF3B3B', updateFrequency: '<1 min' },
       { id: 'volcanic', label: 'Volcanic Activity', color: '#E74C3C', updateFrequency: 'Daily' },
-      { id: 'severe-weather', label: 'Severe Weather', color: '#5DADE2', updateFrequency: 'Hourly' },
+      { id: 'severe-weather', label: 'Severe Weather', color: '#9333EA', updateFrequency: 'Hourly' },
     ]
   },
   {

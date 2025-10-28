@@ -1,7 +1,7 @@
 'use client'
 
 interface MapPopupProps {
-  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather'
+  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage'
   data: {
     location?: string
     magnitude?: number
@@ -22,61 +22,10 @@ interface MapPopupProps {
     description?: string
     instruction?: string
     areaDesc?: string
-  }
-}
-
-// Helper functions for severe weather
-function getEventCategory(event: string): string {
-  const lower = event.toLowerCase()
-  if (lower.includes('tornado')) return 'Tornado'
-  if (lower.includes('hurricane') || lower.includes('typhoon')) return 'Hurricane'
-  if (lower.includes('flood')) return 'Flood'
-  if (lower.includes('fire')) return 'Fire'
-  if (lower.includes('snow') || lower.includes('blizzard')) return 'Winter Storm'
-  if (lower.includes('thunderstorm')) return 'Severe T-Storm'
-  if (lower.includes('heat')) return 'Heat'
-  if (lower.includes('wind')) return 'High Wind'
-  return event.split(' ')[0] // First word
-}
-
-function getEventBadgeColor(event: string): string {
-  const lower = event.toLowerCase()
-  if (lower.includes('tornado')) return '#8B0000'
-  if (lower.includes('hurricane') || lower.includes('typhoon')) return '#800080'
-  if (lower.includes('flood')) return '#4169E1'
-  if (lower.includes('fire')) return '#FF4500'
-  if (lower.includes('snow') || lower.includes('blizzard')) return '#4682B4'
-  if (lower.includes('heat')) return '#FF6347'
-  if (lower.includes('wind')) return '#708090'
-  return '#9333EA'
-}
-
-function getSeverityColor(severity: string): string {
-  switch (severity) {
-    case 'Extreme': return '#8B0000'
-    case 'Severe': return '#DC143C'
-    case 'Moderate': return '#FF8C42'
-    case 'Minor': return '#FFD93D'
-    default: return '#8F9BB0'
-  }
-}
-
-function formatExpiration(expires: string): string {
-  try {
-    const expireDate = new Date(expires)
-    const now = new Date()
-    const diffMs = expireDate.getTime() - now.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-
-    if (diffMs < 0) return 'Expired'
-    if (diffHours === 0) return `${diffMins}m remaining`
-    if (diffHours < 24) return `${diffHours}h ${diffMins}m remaining`
-
-    const diffDays = Math.floor(diffHours / 24)
-    return `${diffDays}d ${diffHours % 24}h remaining`
-  } catch {
-    return expires
+    country?: string
+    cause?: string
+    type?: string
+    isps?: string[]
   }
 }
 
@@ -84,205 +33,360 @@ const typeColors = {
   earthquake: '#FF3B3B',
   hazard: '#FFB341',
   outage: '#5E6A81',
-  latency: '#39D0FF',
+  latency: '#00E400',
   powerOutage: '#FFD700',
   severeWeather: '#9333EA',
+  internetOutage: '#4ECDC4',
 }
 
 const typeLabels = {
-  earthquake: 'Earthquake',
-  hazard: 'Hazard',
-  outage: 'Outage',
-  latency: 'Latency',
-  powerOutage: 'Power Outage',
-  severeWeather: 'Severe Weather',
+  earthquake: 'EARTHQUAKE',
+  hazard: 'HAZARD',
+  outage: 'OUTAGE',
+  latency: 'LATENCY',
+  powerOutage: 'POWER OUTAGE',
+  severeWeather: 'SEVERE WEATHER',
+  internetOutage: 'INTERNET OUTAGE',
 }
 
 export default function MapPopup({ type, data }: MapPopupProps) {
+  // Determine primary metric
+  let primaryValue = ''
+  let primaryLabel = ''
+
+  if (type === 'earthquake' && data.magnitude) {
+    primaryValue = data.magnitude.toFixed(1)
+    primaryLabel = 'MAGNITUDE'
+  } else if (type === 'hazard' && data.severity) {
+    primaryValue = data.severity
+    primaryLabel = 'SEVERITY'
+  } else if (type === 'latency' && data.latency) {
+    primaryValue = `${data.latency}ms`
+    primaryLabel = 'LATENCY'
+  } else if (type === 'powerOutage' && data.customers_out) {
+    primaryValue = data.customers_out.toLocaleString()
+    primaryLabel = 'CUSTOMERS OUT'
+  } else if (type === 'severeWeather' && data.severity) {
+    primaryValue = data.severity
+    primaryLabel = 'SEVERITY'
+  } else if (type === 'internetOutage' && data.type) {
+    primaryValue = data.type
+    primaryLabel = 'TYPE'
+  } else if (type === 'outage' && data.affected) {
+    primaryValue = data.affected.toLocaleString()
+    primaryLabel = 'AFFECTED'
+  }
+
   return `
     <div style="
-      font-family: Geist Mono, monospace;
-      background-color: #141821;
+      font-family: Albert Sans, sans-serif;
+      background-color: #080D12;
       border: 1px solid #242C3A;
-      padding: 16px;
-      min-width: 200px;
-      max-width: 280px;
+      border-top: 4px solid ${typeColors[type]};
+      padding: 0;
+      min-width: 240px;
+      max-width: 320px;
     ">
+      <!-- Header -->
       <div style="
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-        padding-bottom: 8px;
+        padding: 24px 24px 16px 24px;
         border-bottom: 1px solid #242C3A;
       ">
         <div style="
-          width: 12px;
-          height: 12px;
-          background-color: ${typeColors[type]};
-        "></div>
-        <span style="
-          font-size: 14px;
+          font-size: 10px;
           font-weight: 600;
-          color: #FFFFFF;
+          color: #5E6A81;
           font-family: Geist Mono, monospace;
-        ">${typeLabels[type]}</span>
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          margin-bottom: 16px;
+        ">${typeLabels[type]}</div>
+
+        ${primaryValue ? `
+          <div style="margin-bottom: 8px;">
+            <div style="
+              font-size: 10px;
+              color: #5E6A81;
+              font-family: Geist Mono, monospace;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 8px;
+            ">${primaryLabel}</div>
+            <div style="
+              font-size: 32px;
+              font-weight: 700;
+              color: ${typeColors[type]};
+              font-family: Geist Mono, monospace;
+              line-height: 1;
+              letter-spacing: -0.02em;
+            ">${primaryValue}</div>
+          </div>
+        ` : ''}
       </div>
 
-      ${type === 'earthquake' ? `
-        ${data.magnitude ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Magnitude</span>
-            <div style="font-size: 22px; font-weight: 600; color: #FF3B3B; font-family: Geist Mono, monospace;">${data.magnitude}</div>
+      <!-- Content -->
+      <div style="padding: 16px 24px;">
+        ${type === 'earthquake' && data.depth ? `
+          <div style="margin-bottom: 16px;">
+            <div style="
+              font-size: 10px;
+              color: #5E6A81;
+              font-family: Geist Mono, monospace;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 4px;
+            ">DEPTH</div>
+            <div style="
+              font-size: 14px;
+              color: #FFFFFF;
+              font-family: Albert Sans, sans-serif;
+            ">${data.depth} km</div>
           </div>
         ` : ''}
-        ${data.depth ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Depth</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.depth} km</div>
-          </div>
-        ` : ''}
-      ` : ''}
 
-      ${type === 'hazard' ? `
-        ${data.severity ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Severity</span>
-            <div style="font-size: 14px; color: #FFB341; font-weight: 600; font-family: Geist Mono, monospace;">${data.severity}</div>
+        ${type === 'hazard' && data.affected ? `
+          <div style="margin-bottom: 16px;">
+            <div style="
+              font-size: 10px;
+              color: #5E6A81;
+              font-family: Geist Mono, monospace;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 4px;
+            ">AFFECTED</div>
+            <div style="
+              font-size: 14px;
+              color: #FFFFFF;
+              font-family: Albert Sans, sans-serif;
+            ">${data.affected.toLocaleString()} people</div>
           </div>
         ` : ''}
-        ${data.affected ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Affected</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.affected.toLocaleString()} people</div>
-          </div>
-        ` : ''}
-      ` : ''}
 
-      ${type === 'outage' ? `
-        ${data.region ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Region</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.region}</div>
+        ${type === 'outage' && data.region ? `
+          <div style="margin-bottom: 16px;">
+            <div style="
+              font-size: 10px;
+              color: #5E6A81;
+              font-family: Geist Mono, monospace;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 4px;
+            ">REGION</div>
+            <div style="
+              font-size: 14px;
+              color: #FFFFFF;
+              font-family: Albert Sans, sans-serif;
+            ">${data.region}</div>
           </div>
         ` : ''}
-        ${data.affected ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Users affected</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.affected.toLocaleString()}</div>
-          </div>
-        ` : ''}
-      ` : ''}
 
-      ${type === 'latency' ? `
-        ${data.latency ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Latency</span>
-            <div style="font-size: 18px; font-weight: 600; color: #39D0FF; font-family: Geist Mono, monospace;">${data.latency} ms</div>
+        ${type === 'latency' && data.region ? `
+          <div style="margin-bottom: 16px;">
+            <div style="
+              font-size: 10px;
+              color: #5E6A81;
+              font-family: Geist Mono, monospace;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-bottom: 4px;
+            ">REGION</div>
+            <div style="
+              font-size: 14px;
+              color: #FFFFFF;
+              font-family: Albert Sans, sans-serif;
+            ">${data.region}</div>
           </div>
         ` : ''}
-        ${data.region ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Region</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.region}</div>
-          </div>
-        ` : ''}
-      ` : ''}
 
-      ${type === 'powerOutage' ? `
-        ${data.customers_out ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Customers Out</span>
-            <div style="font-size: 18px; font-weight: 600; color: #FFD700; font-family: Geist Mono, monospace;">${data.customers_out.toLocaleString()}</div>
-          </div>
-        ` : ''}
-        ${data.percentage_out !== undefined ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Percentage</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.percentage_out}%</div>
-          </div>
-        ` : ''}
-        ${data.severity ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Severity</span>
-            <div style="font-size: 14px; color: #FFD700; font-weight: 600; font-family: Geist Mono, monospace;">${data.severity}</div>
-          </div>
-        ` : ''}
-        ${data.state ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">State</span>
-            <div style="font-size: 14px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.state}</div>
-          </div>
-        ` : ''}
-      ` : ''}
-
-      ${type === 'severeWeather' ? `
-        ${data.headline ? `
-          <div style="margin-bottom: 12px; padding: 12px; background-color: #0A0F16; border-left: 3px solid #9333EA; border-radius: 4px;">
-            <div style="font-size: 13px; color: #FFFFFF; font-family: Geist Mono, monospace; line-height: 1.5; font-weight: 500;">${data.headline}</div>
-          </div>
-        ` : ''}
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          ${data.event ? `
-            <div style="padding: 4px 10px; background-color: ${getEventBadgeColor(data.event)}; border-radius: 4px; font-size: 11px; font-weight: 600; color: #FFFFFF; font-family: Geist Mono, monospace; text-transform: uppercase; letter-spacing: 0.5px;">
-              ${getEventCategory(data.event)}
+        ${type === 'powerOutage' ? `
+          ${data.percentage_out !== undefined ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">PERCENTAGE OUT</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.percentage_out}%</div>
             </div>
           ` : ''}
-          ${data.severity && data.severity !== 'Unknown' ? `
-            <div style="padding: 4px 10px; background-color: ${getSeverityColor(data.severity)}; border-radius: 4px; font-size: 11px; font-weight: 600; color: #FFFFFF; font-family: Geist Mono, monospace;">
-              ${data.severity}
+          ${data.state ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">STATE</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.state}</div>
+            </div>
+          ` : ''}
+        ` : ''}
+
+        ${type === 'severeWeather' ? `
+          ${data.event ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">EVENT</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.event}</div>
             </div>
           ` : ''}
           ${data.urgency && data.urgency !== 'Unknown' ? `
-            <div style="padding: 4px 10px; background-color: #2A3441; border: 1px solid #3D4958; border-radius: 4px; font-size: 11px; font-weight: 500; color: #C6CFDA; font-family: Geist Mono, monospace;">
-              ${data.urgency === 'Immediate' ? '🚨 ' : ''}${data.urgency}
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">URGENCY</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.urgency}</div>
             </div>
           ` : ''}
-        </div>
-        ${data.areaDesc ? `
-          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-radius: 4px; border: 1px solid #242C3A;">
-            <div style="font-size: 11px; color: #8F9BB0; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Affected Areas</div>
-            <div style="font-size: 12px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.4;">${data.areaDesc}</div>
-          </div>
+          ${data.areaDesc ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">AFFECTED AREAS</div>
+              <div style="
+                font-size: 12px;
+                color: #8F9BB0;
+                font-family: Albert Sans, sans-serif;
+                line-height: 1.5;
+              ">${data.areaDesc.substring(0, 120)}${data.areaDesc.length > 120 ? '...' : ''}</div>
+            </div>
+          ` : ''}
         ` : ''}
-        ${data.description ? `
-          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-radius: 4px; border: 1px solid #242C3A; max-height: 120px; overflow-y: auto;">
-            <div style="font-size: 11px; color: #8F9BB0; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Details</div>
-            <div style="font-size: 11px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.5;">${data.description.substring(0, 400)}${data.description.length > 400 ? '...' : ''}</div>
-          </div>
-        ` : ''}
-        ${data.instruction ? `
-          <div style="margin-bottom: 12px; padding: 10px; background-color: #1A2332; border-left: 3px solid #FFB341; border-radius: 4px;">
-            <div style="font-size: 11px; color: #FFB341; font-family: Geist Mono, monospace; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">⚠️ Safety Instructions</div>
-            <div style="font-size: 11px; color: #C6CFDA; font-family: Geist Mono, monospace; line-height: 1.5;">${data.instruction.substring(0, 300)}${data.instruction.length > 300 ? '...' : ''}</div>
-          </div>
-        ` : ''}
-        ${data.certainty ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Certainty</span>
-            <div style="font-size: 13px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.certainty}</div>
-          </div>
-        ` : ''}
-        ${data.expires ? `
-          <div style="margin-bottom: 8px;">
-            <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Expires</span>
-            <div style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">${formatExpiration(data.expires)}</div>
-          </div>
-        ` : ''}
-      ` : ''}
 
-      ${data.location ? `
-        <div style="margin-bottom: 8px;">
-          <span style="font-size: 12px; color: #8F9BB0; font-family: Geist Mono, monospace;">Location</span>
-          <div style="font-size: 12px; color: #C6CFDA; font-family: Geist Mono, monospace;">${data.location}</div>
-        </div>
-      ` : ''}
+        ${type === 'internetOutage' ? `
+          ${data.cause ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">CAUSE</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.cause.replace(/_/g, ' ')}</div>
+            </div>
+          ` : ''}
+          ${data.country ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">COUNTRY</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.country}</div>
+            </div>
+          ` : ''}
+          ${data.isps && data.isps.length > 0 ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">AFFECTED ISPs</div>
+              <div style="
+                font-size: 12px;
+                color: #8F9BB0;
+                font-family: Albert Sans, sans-serif;
+                line-height: 1.5;
+              ">${data.isps.slice(0, 3).join(', ')}${data.isps.length > 3 ? ` +${data.isps.length - 3} more` : ''}</div>
+            </div>
+          ` : ''}
+          ${data.description ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">DESCRIPTION</div>
+              <div style="
+                font-size: 12px;
+                color: #8F9BB0;
+                font-family: Albert Sans, sans-serif;
+                line-height: 1.5;
+              ">${data.description.substring(0, 120)}${data.description.length > 120 ? '...' : ''}</div>
+            </div>
+          ` : ''}
+        ` : ''}
+      </div>
 
-      ${data.time ? `
-        <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #242C3A;">
-          <span style="font-size: 11px; color: #5E6A81; font-family: Geist Mono, monospace;">${data.time}</span>
-        </div>
-      ` : ''}
+      <!-- Footer -->
+      <div style="
+        padding: 16px 24px;
+        border-top: 1px solid #242C3A;
+        background-color: #0A0F16;
+      ">
+        ${data.location ? `
+          <div style="
+            font-size: 12px;
+            color: #8F9BB0;
+            font-family: Albert Sans, sans-serif;
+            margin-bottom: ${data.time ? '8px' : '0'};
+          ">${data.location}</div>
+        ` : ''}
+        ${data.time ? `
+          <div style="
+            font-size: 10px;
+            color: #5E6A81;
+            font-family: Geist Mono, monospace;
+            letter-spacing: 0.5px;
+          ">${data.time}</div>
+        ` : ''}
+      </div>
     </div>
   `
 }

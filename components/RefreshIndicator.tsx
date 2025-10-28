@@ -17,10 +17,6 @@ export default function RefreshIndicator({ lastRefresh, isRefreshing }: RefreshI
       backgroundColor: 'rgba(10, 15, 22, 0.5)',
       border: '1px solid #242C3A',
       borderRadius: '100px',
-      position: 'absolute',
-      top: '24px',
-      right: '24px',
-      zIndex: 100,
       fontFamily: 'Albert Sans, sans-serif',
     }}>
       <div style={{

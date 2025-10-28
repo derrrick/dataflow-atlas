@@ -92,6 +92,22 @@ export interface SevereWeather {
   expires: string
 }
 
+export interface InternetOutage {
+  id: string
+  coords: [number, number]
+  country: string // Country code (e.g., "CM", "US")
+  description: string
+  cause: string // CABLE_CUT, POWER_OUTAGE, GOVERNMENT_SHUTDOWN, etc.
+  type: string // NATIONWIDE, REGIONAL, LOCAL
+  isps: string[] // Affected ISPs
+  asns: number[] // Affected ASN numbers
+  location: string
+  time: string
+  timestamp: number
+  startDate: string
+  endDate: string | null
+}
+
 export interface DataServiceResponse<T> {
   data: T[]
   error?: string
@@ -120,5 +136,5 @@ export interface UnifiedDataPoint {
   layerLabel: string        // Human-readable layer name
 
   // Original data preserved for specialized charts
-  rawData: Earthquake | Wildfire | AirQuality | Hazard | Outage | LatencyPoint | PowerOutage | SevereWeather
+  rawData: Earthquake | Wildfire | AirQuality | Hazard | Outage | LatencyPoint | PowerOutage | SevereWeather | InternetOutage
 }

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useData } from '@/contexts/DataContext'
+import { useLayer } from '@/contexts/LayerContext'
 import { Sparkline } from '@/lib/charts/d3/01-sparkline'
 import { Slopegraph } from '@/lib/charts/d3/05-slopegraph'
 import { SmallMultiples } from '@/lib/charts/d3/06-small-multiples'
@@ -10,12 +11,38 @@ import EnhancedChartModal from './EnhancedChartModal'
 import type { UnifiedDataPoint } from '@/lib/services/dataTypes'
 
 export default function AnalyticalStrip() {
-  const { earthquakes, wildfires, airQuality, powerOutages, severeWeather } = useData()
+  const { earthquakes, wildfires, airQuality, powerOutages, severeWeather, internetOutages } = useData()
+  const { activeLayers } = useLayer()
   const [selectedChartId, setSelectedChartId] = useState<string | null>(null)
   const [hoveredTile, setHoveredTile] = useState<string | null>(null)
 
+  // Filter data based on active layers
+  const filteredEarthquakes = useMemo(() =>
+    activeLayers.has('earthquakes') ? earthquakes : []
+  , [earthquakes, activeLayers])
+
+  const filteredWildfires = useMemo(() =>
+    activeLayers.has('wildfire') ? wildfires : []
+  , [wildfires, activeLayers])
+
+  const filteredAirQuality = useMemo(() =>
+    activeLayers.has('air-quality') ? airQuality : []
+  , [airQuality, activeLayers])
+
+  const filteredPowerOutages = useMemo(() =>
+    activeLayers.has('power-outages') ? powerOutages : []
+  , [powerOutages, activeLayers])
+
+  const filteredSevereWeather = useMemo(() =>
+    activeLayers.has('severe-weather') ? severeWeather : []
+  , [severeWeather, activeLayers])
+
+  const filteredInternetOutages = useMemo(() =>
+    activeLayers.has('internet-outages') ? internetOutages : []
+  , [internetOutages, activeLayers])
+
   // Convert Earthquake[] to UnifiedDataPoint[] for charts
-  const earthquakeUnified: UnifiedDataPoint[] = earthquakes.map(eq => ({
+  const earthquakeUnified: UnifiedDataPoint[] = filteredEarthquakes.map(eq => ({
     id: eq.id,
     coords: eq.coords,
     timestamp: eq.timestamp,
@@ -30,7 +57,7 @@ export default function AnalyticalStrip() {
   }))
 
   // Convert Wildfire[] to UnifiedDataPoint[]
-  const wildfireUnified: UnifiedDataPoint[] = wildfires.map(fire => ({
+  const wildfireUnified: UnifiedDataPoint[] = filteredWildfires.map(fire => ({
     id: fire.id,
     coords: fire.coords,
     timestamp: fire.timestamp,
@@ -45,7 +72,7 @@ export default function AnalyticalStrip() {
   }))
 
   // Convert AirQuality[] to UnifiedDataPoint[]
-  const airQualityUnified: UnifiedDataPoint[] = airQuality.map(aq => ({
+  const airQualityUnified: UnifiedDataPoint[] = filteredAirQuality.map(aq => ({
     id: aq.id,
     coords: aq.coords,
     timestamp: aq.timestamp,
@@ -60,7 +87,7 @@ export default function AnalyticalStrip() {
   }))
 
   // Convert PowerOutage[] to UnifiedDataPoint[]
-  const powerOutageUnified: UnifiedDataPoint[] = powerOutages.map(outage => ({
+  const powerOutageUnified: UnifiedDataPoint[] = filteredPowerOutages.map(outage => ({
     id: outage.id,
     coords: outage.coords,
     timestamp: outage.timestamp,
@@ -75,7 +102,7 @@ export default function AnalyticalStrip() {
   }))
 
   // Convert SevereWeather[] to UnifiedDataPoint[]
-  const severeWeatherUnified: UnifiedDataPoint[] = severeWeather.map(weather => ({
+  const severeWeatherUnified: UnifiedDataPoint[] = filteredSevereWeather.map(weather => ({
     id: weather.id,
     coords: weather.coords,
     timestamp: weather.timestamp,
@@ -87,6 +114,21 @@ export default function AnalyticalStrip() {
     layerType: 'severe-weather',
     layerLabel: 'Severe Weather',
     rawData: weather
+  }))
+
+  // Convert InternetOutage[] to UnifiedDataPoint[]
+  const internetOutageUnified: UnifiedDataPoint[] = filteredInternetOutages.map(outage => ({
+    id: outage.id,
+    coords: outage.coords,
+    timestamp: outage.timestamp,
+    time: outage.time,
+    location: outage.location,
+    primaryValue: outage.cause === 'CABLE_CUT' ? 4 : outage.cause === 'ATTACK' ? 3 : outage.cause === 'POWER_OUTAGE' ? 2 : 1,
+    secondaryValue: outage.type === 'NATIONWIDE' ? 3 : outage.type === 'REGIONAL' ? 2 : 1,
+    severity: outage.type === 'NATIONWIDE' ? 'critical' : outage.type === 'REGIONAL' ? 'high' : 'medium',
+    layerType: 'internet-outages',
+    layerLabel: 'Internet Outages',
+    rawData: outage
   }))
 
 
@@ -158,6 +200,13 @@ export default function AnalyticalStrip() {
           component: <TimeSeries unified={severeWeatherUnified} width={1200} height={700} />,
           data: severeWeatherUnified
         }
+      case 'sparkline-internet-outages':
+        return {
+          name: 'Internet Outage Activity',
+          description: 'Real-time internet outages from Cloudflare Radar showing network disruptions',
+          component: <Sparkline unified={internetOutageUnified} width={1200} height={700} />,
+          data: internetOutageUnified
+        }
       default:
         return null
     }
@@ -220,6 +269,14 @@ export default function AnalyticalStrip() {
       hasData: airQualityUnified.length >= 2,
       priority: airQualityUnified.length * 2.4,
       dataCount: airQualityUnified.length
+    },
+    {
+      id: 'sparkline-internet-outages',
+      name: 'Internet Outages',
+      component: <Sparkline unified={internetOutageUnified} width={280} height={180} />,
+      hasData: internetOutageUnified.length >= 2,
+      priority: internetOutageUnified.length * 2.7,
+      dataCount: internetOutageUnified.length
     }
   ]
 

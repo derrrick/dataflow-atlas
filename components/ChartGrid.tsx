@@ -89,7 +89,7 @@ interface ChartGridProps {
 }
 
 export default function ChartGrid({ showFilters = false, storytellingMode = true }: ChartGridProps) {
-  const { earthquakes, hazards, outages, latencyPoints, airQuality, wildfires } = useData()
+  const { earthquakes, outages, latencyPoints, airQuality, wildfires, powerOutages, severeWeather, internetOutages } = useData()
   const { activeLayers } = useLayer()
   const [chartsToShow, setChartsToShow] = useState(9) // Only show 9 charts initially
   const [selectedChartId, setSelectedChartId] = useState<string | null>(null)
@@ -110,12 +110,14 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
       earthquakes: earthquakes || [],
       wildfires: wildfires || [],
       airQuality: airQuality || [],
-      hazards: hazards || [],
       outages: outages || [],
       latency: latencyPoints || [],
+      powerOutages: powerOutages || [],
+      severeWeather: severeWeather || [],
+      internetOutages: internetOutages || [],
       activeLayers,
     })
-  }, [earthquakes, wildfires, airQuality, hazards, outages, latencyPoints, activeLayers])
+  }, [earthquakes, wildfires, airQuality, outages, latencyPoints, powerOutages, severeWeather, internetOutages, activeLayers])
 
   // Limit data size for performance - sample if too large
   const sampledData = useMemo(() => {
@@ -132,9 +134,6 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
       earthquakes: earthquakes?.length > maxDataPoints
         ? earthquakes.slice(0, maxDataPoints)
         : (earthquakes || []),
-      hazards: hazards?.length > maxDataPoints
-        ? hazards.slice(0, maxDataPoints)
-        : (hazards || []),
       outages: outages?.length > maxDataPoints
         ? outages.slice(0, maxDataPoints)
         : (outages || []),
@@ -147,8 +146,17 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
       wildfires: wildfires?.length > maxDataPoints
         ? wildfires.slice(0, maxDataPoints)
         : (wildfires || []),
+      powerOutages: powerOutages?.length > maxDataPoints
+        ? powerOutages.slice(0, maxDataPoints)
+        : (powerOutages || []),
+      severeWeather: severeWeather?.length > maxDataPoints
+        ? severeWeather.slice(0, maxDataPoints)
+        : (severeWeather || []),
+      internetOutages: internetOutages?.length > maxDataPoints
+        ? internetOutages.slice(0, maxDataPoints)
+        : (internetOutages || []),
     }
-  }, [unifiedData, earthquakes, hazards, outages, latencyPoints, airQuality, wildfires])
+  }, [unifiedData, earthquakes, outages, latencyPoints, airQuality, wildfires, powerOutages, severeWeather, internetOutages])
 
   // Apply filters to chart registry
   const filteredCharts = useMemo(() => {
@@ -343,11 +351,13 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
                 data={sampledData.unified || []}
                 unified={sampledData.unified || []}
                 earthquakes={sampledData.earthquakes || []}
-                hazards={sampledData.hazards || []}
                 outages={sampledData.outages || []}
                 latency={sampledData.latency || []}
                 airQuality={sampledData.airQuality || []}
                 wildfires={sampledData.wildfires || []}
+                powerOutages={sampledData.powerOutages || []}
+                severeWeather={sampledData.severeWeather || []}
+                internetOutages={sampledData.internetOutages || []}
                 activeLayers={activeLayers}
               />
             </div>
@@ -445,11 +455,13 @@ export default function ChartGrid({ showFilters = false, storytellingMode = true
                 unified={sampledData.unified || []}
                 data={sampledData.unified || []}
                 earthquakes={sampledData.earthquakes || []}
-                hazards={sampledData.hazards || []}
                 outages={sampledData.outages || []}
                 latency={sampledData.latency || []}
                 airQuality={sampledData.airQuality || []}
                 wildfires={sampledData.wildfires || []}
+                powerOutages={sampledData.powerOutages || []}
+                severeWeather={sampledData.severeWeather || []}
+                internetOutages={sampledData.internetOutages || []}
                 width={1200}
                 height={700}
               />

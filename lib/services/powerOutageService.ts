@@ -2,10 +2,10 @@ import { formatRelativeTime } from './apiClient'
 import type { PowerOutage, DataServiceResponse } from './dataTypes'
 import { getRecentEventsByType } from '@/lib/supabase'
 
-export async function fetchPowerOutages(): Promise<DataServiceResponse<PowerOutage>> {
+export async function fetchPowerOutages(t0?: number, t1?: number): Promise<DataServiceResponse<PowerOutage>> {
   try {
-    // Fetch real power outage data from Supabase (last 72 hours)
-    const events = await getRecentEventsByType('power_outage', 72)
+    // Fetch real power outage data from Supabase
+    const events = await getRecentEventsByType('power_outage', t0 && t1 ? { t0, t1 } : { hoursBack: 72 })
 
     const outages: PowerOutage[] = events
       .map(event => {

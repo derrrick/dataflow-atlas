@@ -190,3 +190,26 @@ a {
 .fade-in {
   animation: fadeIn 400ms var(--fa-easing);
 }
+
+/* Animated gradient border */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateGradient {
+  to {
+    --angle: 360deg;
+  }
+}
+
+.explore-button {
+  position: relative;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(10, 15, 22, 0.5), rgba(10, 15, 22, 0.5)) padding-box,
+    linear-gradient(var(--angle), rgba(20, 24, 33, 0.5), rgba(60, 70, 90, 0.5), rgba(20, 24, 33, 0.5)) border-box;
+  animation: rotateGradient 14s linear infinite;
+  backdrop-filter: blur(12px);
+}

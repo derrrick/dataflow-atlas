@@ -53,10 +53,10 @@ function parseFIRMSCSV(csvText: string): FIRMSRecord[] {
   return records
 }
 
-export async function fetchWildfires(apiKey?: string): Promise<DataServiceResponse<Wildfire>> {
+export async function fetchWildfires(t0?: number, t1?: number, apiKey?: string): Promise<DataServiceResponse<Wildfire>> {
   try {
-    // Fetch real wildfire data from Supabase (last 72 hours)
-    const events = await getRecentEventsByType('wildfire', 72)
+    // Fetch real wildfire data from Supabase
+    const events = await getRecentEventsByType('wildfire', t0 && t1 ? { t0, t1 } : { hoursBack: 72 })
 
     const wildfires: Wildfire[] = events
       .map(event => {

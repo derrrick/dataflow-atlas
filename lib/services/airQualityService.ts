@@ -23,10 +23,10 @@ function getQualityCategory(aqi: number): AirQuality['quality'] {
   return 'Hazardous'
 }
 
-export async function fetchAirQuality(): Promise<DataServiceResponse<AirQuality>> {
+export async function fetchAirQuality(t0?: number, t1?: number): Promise<DataServiceResponse<AirQuality>> {
   try {
-    // Fetch real air quality data from Supabase (last 72 hours)
-    const events = await getRecentEventsByType('air_quality', 72)
+    // Fetch real air quality data from Supabase
+    const events = await getRecentEventsByType('air_quality', t0 && t1 ? { t0, t1 } : { hoursBack: 72 })
 
     const airQuality: AirQuality[] = events
       .map(event => {

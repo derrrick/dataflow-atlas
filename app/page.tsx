@@ -1,15 +1,22 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { ChartNoAxesColumn, ChevronUp, ChevronDown } from 'lucide-react'
 import { LayerProvider } from '@/contexts/LayerContext'
-import { DataProvider } from '@/contexts/DataContext'
+import { DataProvider, useData } from '@/contexts/DataContext'
+import { TimeProvider } from '@/contexts/TimeContext'
 import LayerControls from '@/components/LayerControls'
 import AnalyticalStrip from '@/components/AnalyticalStrip'
 import Header from '@/components/Header'
 import ExpandablePanel from '@/components/ExpandablePanel'
 import ChartGrid from '@/components/ChartGrid'
 import DataStatusBanner from '@/components/DataStatusBanner'
+import TimeScrubber from '@/components/TimeScrubber'
+import StatusChips from '@/components/StatusChips'
+import RefreshIndicator from '@/components/RefreshIndicator'
+import PermalinkManager from '@/components/PermalinkManager'
+import { useTime } from '@/contexts/TimeContext'
 
 const Globe = dynamic(() => import('@/components/GlobeMapLibre'), {
   ssr: false,
@@ -27,11 +34,14 @@ const Globe = dynamic(() => import('@/components/GlobeMapLibre'), {
   )
 })
 
-export default function Home() {
+function HomeContent() {
+  const { t0, t1, setTimeRange } = useTime()
+  const { isRefreshing, lastRefresh } = useData()
+  const [scrubberExpanded, setScrubberExpanded] = useState(false)
+  const [panelExpanded, setPanelExpanded] = useState(false)
+
   return (
-    <DataProvider>
-      <LayerProvider>
-        <div style={{
+    <div style={{
           width: '100vw',
           height: '100vh',
           overflow: 'hidden',
@@ -70,9 +80,79 @@ export default function Home() {
             }}>
               <LayerControls />
             </div>
+
+            {/* Status chips for data freshness */}
+            <div style={{
+              position: 'absolute',
+              top: '24px',
+              right: '24px',
+              zIndex: 1000,
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px'
+            }}>
+              <RefreshIndicator isRefreshing={isRefreshing} lastRefresh={lastRefresh} />
+              <StatusChips />
+            </div>
+
+            {/* Time scrubber - aligned left */}
+            <div style={{
+              position: 'absolute',
+              bottom: '24px',
+              left: '24px',
+              zIndex: 100
+            }}>
+              <TimeScrubber onChange={setTimeRange} onExpandChange={setScrubberExpanded} />
+            </div>
+
+            {/* Explore the data button */}
+            <div style={{
+              position: 'absolute',
+              bottom: '24px',
+              left: scrubberExpanded ? '588px' : '108px',
+              zIndex: panelExpanded ? 1001 : 100,
+              transition: 'left 400ms cubic-bezier(0.25, 0.1, 0.25, 1)'
+            }}>
+              <button
+                onClick={() => setPanelExpanded(!panelExpanded)}
+                className="explore-button"
+                style={{
+                  padding: '14px 28px',
+                  borderRadius: '100px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  fontFamily: 'Albert Sans, sans-serif',
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  height: '60px'
+                }}
+              >
+                {panelExpanded ? (
+                  <>
+                    <ChevronDown size={14} />
+                    <span>Back to Overview</span>
+                  </>
+                ) : (
+                  <>
+                    <ChartNoAxesColumn size={14} />
+                    <span>Explore the data</span>
+                    <ChevronUp size={14} />
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Permalink manager */}
+            <PermalinkManager t0={t0} t1={t1} />
           </div>
 
           <ExpandablePanel
+            isExpanded={panelExpanded}
+            onClose={() => setPanelExpanded(false)}
             collapsedContent={
               <>
                 <div style={{
@@ -125,7 +205,17 @@ export default function Home() {
             expandedContent={<ChartGrid showFilters={true} />}
           />
         </div>
-      </LayerProvider>
-    </DataProvider>
+  )
+}
+
+export default function Home() {
+  return (
+    <TimeProvider>
+      <DataProvider>
+        <LayerProvider>
+          <HomeContent />
+        </LayerProvider>
+      </DataProvider>
+    </TimeProvider>
   )
 }

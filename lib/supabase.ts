@@ -37,7 +37,7 @@ export const supabaseAdmin = supabaseServiceKey
 export interface UnifiedEvent {
   id: string
   timestamp: number
-  data_type: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather'
+  data_type: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather' | 'internet_outage'
   primary_value: number
   secondary_value?: number
   location: {
@@ -136,20 +136,29 @@ export async function getEventsByTimeRange(
 }
 
 /**
- * Get recent events by type (last 72 hours)
+ * Get recent events by type
+ * Can filter by explicit time range (t0, t1) or relative time (hoursBack)
  */
 export async function getRecentEventsByType(
-  dataType: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather',
-  hoursBack: number = 72
+  dataType: 'earthquake' | 'wildfire' | 'air_quality' | 'power_outage' | 'severe_weather' | 'internet_outage',
+  options?: {
+    hoursBack?: number
+    t0?: number
+    t1?: number
+  }
 ): Promise<UnifiedEvent[]> {
-  const now = Date.now()
-  const startTime = now - (hoursBack * 60 * 60 * 1000)
+  const { hoursBack = 72, t0, t1 } = options || {}
+
+  // Use explicit time range if provided, otherwise calculate from hoursBack
+  const startTime = t0 !== undefined ? t0 : Date.now() - (hoursBack * 60 * 60 * 1000)
+  const endTime = t1 !== undefined ? t1 : Date.now()
 
   const { data, error } = await supabase
     .from('unified_events')
     .select('*')
     .eq('data_type', dataType)
     .gte('timestamp', startTime)
+    .lte('timestamp', endTime)
     .order('timestamp', { ascending: false })
 
   if (error) {

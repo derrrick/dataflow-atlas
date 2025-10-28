@@ -85,8 +85,9 @@ function generateStableLatency(): LatencyPoint[] {
   })
 }
 
-export async function fetchOutages(): Promise<DataServiceResponse<Outage>> {
+export async function fetchOutages(t0?: number, t1?: number): Promise<DataServiceResponse<Outage>> {
   // Simulate API call delay
+  // Note: t0/t1 parameters unused as this generates demo data
   await new Promise(resolve => setTimeout(resolve, 250))
 
   stableOutages = generateStableOutages()
@@ -100,8 +101,9 @@ export async function fetchOutages(): Promise<DataServiceResponse<Outage>> {
   }
 }
 
-export async function fetchLatency(): Promise<DataServiceResponse<LatencyPoint>> {
+export async function fetchLatency(t0?: number, t1?: number): Promise<DataServiceResponse<LatencyPoint>> {
   // Simulate API call delay
+  // Note: t0/t1 parameters unused as this generates demo data
   await new Promise(resolve => setTimeout(resolve, 200))
 
   stableLatency = generateStableLatency()

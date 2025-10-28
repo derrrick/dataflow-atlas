@@ -49,15 +49,11 @@ function generateStableHazards(): Hazard[] {
 }
 
 export async function fetchHazards(): Promise<DataServiceResponse<Hazard>> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 300))
-
-  stableHazards = generateStableHazards()
-
-  console.log(`✅ Generated ${stableHazards.length} stable hazards`)
+  // Mock hazards disabled - waiting for real data source
+  console.log('⚠️ Hazards disabled (mock data removed)')
 
   return {
-    data: stableHazards,
+    data: [],
     timestamp: Date.now(),
     cached: false,
   }

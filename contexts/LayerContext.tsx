@@ -49,7 +49,7 @@ const LayerContext = createContext<LayerContextType | undefined>(undefined)
 export function LayerProvider({ children }: { children: ReactNode }) {
   // Start with all data layers that have available data turned on by default
   const [activeLayers, setActiveLayers] = useState<Set<Layer | LegacyLayer>>(
-    new Set(['earthquakes', 'wildfire', 'air-quality', 'power-outages', 'severe-weather', 'latency'])
+    new Set(['earthquakes', 'wildfire', 'air-quality', 'power-outages', 'severe-weather', 'latency', 'internet-outages'])
   )
 
   const toggleLayer = (layerId: Layer | LegacyLayer) => {

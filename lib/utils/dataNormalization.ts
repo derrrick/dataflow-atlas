@@ -2,9 +2,11 @@ import type {
   Earthquake,
   Wildfire,
   AirQuality,
-  Hazard,
   Outage,
   LatencyPoint,
+  PowerOutage,
+  SevereWeather,
+  InternetOutage,
   UnifiedDataPoint,
   SeverityLevel,
 } from '@/lib/services/dataTypes'
@@ -98,24 +100,79 @@ export function normalizeAirQuality(airQuality: AirQuality[]): UnifiedDataPoint[
   })
 }
 
-export function normalizeHazards(hazards: Hazard[]): UnifiedDataPoint[] {
-  return hazards.map(hazard => {
-    // Convert severity to numeric 0-100
-    const severityMap = { Low: 25, Medium: 50, High: 75 }
-    const primaryValue = severityMap[hazard.severity] || 50
+export function normalizePowerOutages(powerOutages: PowerOutage[]): UnifiedDataPoint[] {
+  return powerOutages.map(outage => {
+    const primaryValue = Math.min((Math.log10(outage.customers_out + 1) / 7) * 100, 100)
+
+    let severity: SeverityLevel
+    if (outage.customers_out >= 100000) severity = 'critical'
+    else if (outage.customers_out >= 50000) severity = 'high'
+    else if (outage.customers_out >= 10000) severity = 'medium'
+    else severity = 'low'
 
     return {
-      id: hazard.id,
-      coords: hazard.coords,
-      timestamp: hazard.timestamp,
-      time: hazard.time,
-      location: hazard.location,
+      id: outage.id,
+      coords: outage.coords,
+      timestamp: outage.timestamp,
+      time: outage.time,
+      location: outage.location,
       primaryValue,
-      secondaryValue: hazard.affected,
-      severity: hazard.severity.toLowerCase() as SeverityLevel,
-      layerType: 'hazards',
-      layerLabel: 'General Hazards',
-      rawData: hazard,
+      secondaryValue: outage.customers_out,
+      severity,
+      layerType: 'power-outages',
+      layerLabel: 'Power Outages',
+      rawData: outage,
+    }
+  })
+}
+
+export function normalizeSevereWeather(severeWeather: SevereWeather[]): UnifiedDataPoint[] {
+  return severeWeather.map(weather => {
+    const primaryValue = weather.severity === 'Extreme' ? 100 : weather.severity === 'Severe' ? 75 : weather.severity === 'Moderate' ? 50 : 25
+
+    let severity: SeverityLevel
+    if (weather.severity === 'Extreme') severity = 'critical'
+    else if (weather.severity === 'Severe') severity = 'high'
+    else if (weather.severity === 'Moderate') severity = 'medium'
+    else severity = 'low'
+
+    return {
+      id: weather.id,
+      coords: weather.coords,
+      timestamp: weather.timestamp,
+      time: weather.time,
+      location: weather.location,
+      primaryValue,
+      secondaryValue: weather.urgency === 'Immediate' ? 100 : weather.urgency === 'Expected' ? 50 : 25,
+      severity,
+      layerType: 'severe-weather',
+      layerLabel: 'Severe Weather',
+      rawData: weather,
+    }
+  })
+}
+
+export function normalizeInternetOutages(internetOutages: InternetOutage[]): UnifiedDataPoint[] {
+  return internetOutages.map(outage => {
+    const primaryValue = outage.type === 'NATIONWIDE' ? 100 : outage.type === 'REGIONAL' ? 75 : outage.type === 'LOCAL' ? 50 : 25
+
+    let severity: SeverityLevel
+    if (outage.type === 'NATIONWIDE') severity = 'critical'
+    else if (outage.type === 'REGIONAL') severity = 'high'
+    else severity = 'medium'
+
+    return {
+      id: outage.id,
+      coords: outage.coords,
+      timestamp: outage.timestamp,
+      time: outage.time,
+      location: outage.location,
+      primaryValue,
+      secondaryValue: outage.cause === 'CABLE_CUT' ? 100 : outage.cause === 'ATTACK' ? 90 : outage.cause === 'POWER_OUTAGE' ? 70 : 50,
+      severity,
+      layerType: 'internet-outages',
+      layerLabel: 'Internet Outages',
+      rawData: outage,
     }
   })
 }
@@ -182,12 +239,14 @@ export function unifyAllData(params: {
   earthquakes: Earthquake[]
   wildfires: Wildfire[]
   airQuality: AirQuality[]
-  hazards: Hazard[]
   outages: Outage[]
   latency: LatencyPoint[]
+  powerOutages: PowerOutage[]
+  severeWeather: SevereWeather[]
+  internetOutages: InternetOutage[]
   activeLayers: Set<string>
 }): UnifiedDataPoint[] {
-  const { earthquakes, wildfires, airQuality, hazards, outages, latency, activeLayers } = params
+  const { earthquakes, wildfires, airQuality, outages, latency, powerOutages, severeWeather, internetOutages, activeLayers } = params
   const unified: UnifiedDataPoint[] = []
 
   if (activeLayers.has('earthquakes')) {
@@ -199,14 +258,20 @@ export function unifyAllData(params: {
   if (activeLayers.has('air-quality')) {
     unified.push(...normalizeAirQuality(airQuality))
   }
-  if (activeLayers.has('hazards')) {
-    unified.push(...normalizeHazards(hazards))
-  }
-  if (activeLayers.has('power-outages') || activeLayers.has('internet-outages') || activeLayers.has('cellular-outages')) {
+  if (activeLayers.has('outages')) {
     unified.push(...normalizeOutages(outages))
   }
   if (activeLayers.has('latency')) {
     unified.push(...normalizeLatency(latency))
+  }
+  if (activeLayers.has('power-outages')) {
+    unified.push(...normalizePowerOutages(powerOutages))
+  }
+  if (activeLayers.has('severe-weather')) {
+    unified.push(...normalizeSevereWeather(severeWeather))
+  }
+  if (activeLayers.has('internet-outages')) {
+    unified.push(...normalizeInternetOutages(internetOutages))
   }
 
   // Sort by timestamp (most recent first)
