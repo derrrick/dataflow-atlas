@@ -59,13 +59,20 @@
    - Component was appearing above modals
    - Now properly positioned in stacking context
    - Changed in `/app/page.tsx:443`
-2. ✅ Created `vercel.json` with cron configuration
-   - Triggers `/api/cron/ingest` every 5 minutes
-   - Automatic data refresh on Vercel deployment
-   - Schedule: `*/5 * * * *` (every 5 minutes)
+2. ✅ Deployed to Vercel Production
+   - URL: https://dataflow-atlas-kp25gvhae-derricks-projects-7b5c3a91.vercel.app
+   - Automatic cron jobs disabled (Hobby plan limit: 2 crons max across all projects)
+   - Manual data refresh available via: `/api/cron/ingest` endpoint
+   - All UI improvements and components successfully deployed
 3. ✅ Cleaned up duplicate dev server processes
    - Killed old node processes
    - Started fresh dev server on port 3001
+
+### Notes
+- **Vercel Cron Limitation**: Hobby plan allows max 2 cron jobs across all projects
+  - Account already has 2 crons configured on other projects
+  - To enable automatic data refresh: Remove unused cron jobs OR upgrade to Pro plan
+  - Alternative: Set up external cron service (GitHub Actions, cron-job.org) to hit the endpoint
 
 ### Completed Tasks (Session 2 - Oct 28, 2025)
 1. ✅ Moved search to top-left (24px, 24px)
