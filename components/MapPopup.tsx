@@ -1,7 +1,7 @@
 'use client'
 
 interface MapPopupProps {
-  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage'
+  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage' | 'airQuality'
   data: {
     location?: string
     magnitude?: number
@@ -26,6 +26,11 @@ interface MapPopupProps {
     cause?: string
     type?: string
     isps?: string[]
+    aqi?: number
+    pm25?: number
+    quality?: string
+    parameter?: string
+    category?: string
   }
 }
 
@@ -37,6 +42,7 @@ const typeColors = {
   powerOutage: '#FFD700',
   severeWeather: '#9333EA',
   internetOutage: '#4ECDC4',
+  airQuality: '#A855F7',
 }
 
 const typeLabels = {
@@ -47,6 +53,7 @@ const typeLabels = {
   powerOutage: 'POWER OUTAGE',
   severeWeather: 'SEVERE WEATHER',
   internetOutage: 'INTERNET OUTAGE',
+  airQuality: 'AIR QUALITY',
 }
 
 export default function MapPopup({ type, data }: MapPopupProps) {
@@ -72,6 +79,9 @@ export default function MapPopup({ type, data }: MapPopupProps) {
   } else if (type === 'internetOutage' && data.type) {
     primaryValue = data.type
     primaryLabel = 'TYPE'
+  } else if (type === 'airQuality' && data.aqi !== undefined) {
+    primaryValue = data.aqi.toString()
+    primaryLabel = 'AQI'
   } else if (type === 'outage' && data.affected) {
     primaryValue = data.affected.toLocaleString()
     primaryLabel = 'AFFECTED'
@@ -359,6 +369,60 @@ export default function MapPopup({ type, data }: MapPopupProps) {
                 font-family: Albert Sans, sans-serif;
                 line-height: 1.5;
               ">${data.description.substring(0, 120)}${data.description.length > 120 ? '...' : ''}</div>
+            </div>
+          ` : ''}
+        ` : ''}
+
+        ${type === 'airQuality' ? `
+          ${data.quality ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">CATEGORY</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.quality}</div>
+            </div>
+          ` : ''}
+          ${data.pm25 ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">PM2.5 CONCENTRATION</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.pm25} μg/m³</div>
+            </div>
+          ` : ''}
+          ${data.parameter ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">PARAMETER</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.parameter}</div>
             </div>
           ` : ''}
         ` : ''}

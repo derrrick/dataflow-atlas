@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 
     // Run all ingestion jobs in parallel
-    const [earthquakeRes, airQualityRes, wildfireRes] = await Promise.allSettled([
+    const [earthquakeRes, airQualityRes, wildfireRes, powerOutageRes, severeWeatherRes, internetOutageRes] = await Promise.allSettled([
       // Earthquakes: Fetch 7-day window for better global coverage (service layer filters to 72h)
       fetch(`${baseUrl}/api/ingest/earthquakes?timeframe=week&magnitude=all`, {
         method: 'GET',
@@ -48,6 +48,24 @@ export async function GET(request: NextRequest) {
       fetch(`${baseUrl}/api/ingest/wildfires?source=VIIRS_SNPP_NRT&days=1`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
+      }),
+
+      // Power Outages: Every 5 minutes (EIA updates every 10-15 minutes)
+      fetch(`${baseUrl}/api/ingest/power-outages`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }),
+
+      // Severe Weather: Every 5 minutes (NOAA NWS updates in real-time)
+      fetch(`${baseUrl}/api/ingest/severe-weather`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }),
+
+      // Internet Outages: Every 5 minutes (Cloudflare Radar updates frequently)
+      fetch(`${baseUrl}/api/ingest/internet-outages?days=7`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       })
     ])
 
@@ -55,7 +73,10 @@ export async function GET(request: NextRequest) {
     const results = {
       earthquakes: { status: 'unknown', count: 0, message: '' },
       airQuality: { status: 'unknown', count: 0, message: '' },
-      wildfires: { status: 'unknown', count: 0, message: '' }
+      wildfires: { status: 'unknown', count: 0, message: '' },
+      powerOutages: { status: 'unknown', count: 0, message: '' },
+      severeWeather: { status: 'unknown', count: 0, message: '' },
+      internetOutages: { status: 'unknown', count: 0, message: '' }
     }
 
     // Parse earthquake results
@@ -106,12 +127,63 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Parse power outage results
+    if (powerOutageRes.status === 'fulfilled' && powerOutageRes.value.ok) {
+      const data = await powerOutageRes.value.json()
+      results.powerOutages = {
+        status: 'success',
+        count: data.count || 0,
+        message: data.message || ''
+      }
+    } else {
+      results.powerOutages = {
+        status: 'error',
+        count: 0,
+        message: powerOutageRes.status === 'rejected' ? powerOutageRes.reason : 'Failed to fetch'
+      }
+    }
+
+    // Parse severe weather results
+    if (severeWeatherRes.status === 'fulfilled' && severeWeatherRes.value.ok) {
+      const data = await severeWeatherRes.value.json()
+      results.severeWeather = {
+        status: 'success',
+        count: data.count || 0,
+        message: data.message || ''
+      }
+    } else {
+      results.severeWeather = {
+        status: 'error',
+        count: 0,
+        message: severeWeatherRes.status === 'rejected' ? severeWeatherRes.reason : 'Failed to fetch'
+      }
+    }
+
+    // Parse internet outage results
+    if (internetOutageRes.status === 'fulfilled' && internetOutageRes.value.ok) {
+      const data = await internetOutageRes.value.json()
+      results.internetOutages = {
+        status: 'success',
+        count: data.count || 0,
+        message: data.message || ''
+      }
+    } else {
+      results.internetOutages = {
+        status: 'error',
+        count: 0,
+        message: internetOutageRes.status === 'rejected' ? internetOutageRes.reason : 'Failed to fetch'
+      }
+    }
+
     const duration = Date.now() - startTime
 
     console.log(`✅ Scheduled ingestion complete in ${duration}ms:`)
     console.log(`   - Earthquakes: ${results.earthquakes.count} events (${results.earthquakes.status})`)
     console.log(`   - Air Quality: ${results.airQuality.count} observations (${results.airQuality.status})`)
     console.log(`   - Wildfires: ${results.wildfires.count} detections (${results.wildfires.status})`)
+    console.log(`   - Power Outages: ${results.powerOutages.count} incidents (${results.powerOutages.status})`)
+    console.log(`   - Severe Weather: ${results.severeWeather.count} alerts (${results.severeWeather.status})`)
+    console.log(`   - Internet Outages: ${results.internetOutages.count} outages (${results.internetOutages.status})`)
 
     return NextResponse.json({
       success: true,

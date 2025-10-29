@@ -361,9 +361,9 @@ export default function GlobeMapLibre() {
         type: 'circle',
         source: 'airQuality-src',
         paint: {
-          'circle-color': '#19C6A6',
+          'circle-color': '#A855F7',
           'circle-opacity': 0,
-          'circle-stroke-color': '#19C6A6',
+          'circle-stroke-color': '#A855F7',
           'circle-stroke-width': [
             'interpolate',
             ['linear'],
@@ -654,9 +654,9 @@ export default function GlobeMapLibre() {
         type: 'circle',
         source: 'airQuality-src',
         paint: {
-          'circle-color': '#19C6A6',
+          'circle-color': '#A855F7',
           'circle-opacity': 0.15,
-          'circle-stroke-color': '#19C6A6',
+          'circle-stroke-color': '#A855F7',
           'circle-stroke-width': 1,
           'circle-radius': [
             'interpolate',
@@ -810,11 +810,13 @@ export default function GlobeMapLibre() {
               time: props?.time
             }
           } else if (layerId === 'airQuality-layer') {
-            // Air quality nodes - show as outage for now
-            popupType = 'outage'
+            popupType = 'airQuality'
             popupData = {
-              region: props?.quality || 'Moderate',
-              affected: 0,
+              aqi: props?.aqi,
+              pm25: props?.pm25,
+              quality: props?.quality,
+              parameter: props?.parameter || 'PM2.5',
+              category: props?.category,
               location: props?.location,
               time: props?.time
             }
@@ -1117,6 +1119,23 @@ export default function GlobeMapLibre() {
         mapRef.current = null
       }
     }
+  }, [])
+
+  // Listen for search events
+  useEffect(() => {
+    const handleSearch = (e: CustomEvent) => {
+      const { lat, lon, zoom } = e.detail
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [lon, lat],
+          zoom: zoom || 8,
+          duration: 1500
+        })
+      }
+    }
+
+    window.addEventListener('map:search' as any, handleSearch as EventListener)
+    return () => window.removeEventListener('map:search' as any, handleSearch as EventListener)
   }, [])
 
   // Update earthquake data

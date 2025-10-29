@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { Rss } from 'lucide-react'
 
 type ModalType = 'about' | 'methods' | 'api' | 'access' | null
 
@@ -104,29 +105,31 @@ export default function Header() {
           <button
             onClick={() => openModal('access')}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 1)'
-              e.currentTarget.style.boxShadow = '0 0 24px rgba(8, 13, 18, 0.6), 0 4px 12px rgba(8, 13, 18, 0.3)'
-              e.currentTarget.style.transform = 'translateY(-1px)'
+              e.currentTarget.style.color = '#C6CFDA'
+              e.currentTarget.style.borderColor = 'rgba(143, 155, 176, 0.3)'
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.color = '#8F9BB0'
+              e.currentTarget.style.borderColor = 'rgba(143, 155, 176, 0.15)'
             }}
             style={{
-              padding: '10px 24px',
+              padding: '8px 16px',
               fontSize: '14px',
-              fontWeight: 700,
+              fontWeight: 400,
               fontFamily: 'Albert Sans, sans-serif',
-              color: '#FFFFFF',
-              backgroundColor: '#0A0F16',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '100px',
+              color: '#8F9BB0',
+              backgroundColor: 'transparent',
+              border: '1px solid rgba(143, 155, 176, 0.15)',
+              borderRadius: '0px',
               cursor: 'pointer',
               transition: 'all 200ms cubic-bezier(0.25, 0.1, 0.25, 1)',
-              marginLeft: '24px'
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginLeft: '16px'
             }}>
-            Get custom alerts
+            <Rss size={14} />
+            Create custom alerts
           </button>
         </nav>
       </div>

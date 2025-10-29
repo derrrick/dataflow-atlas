@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLayer, type Layer, type NaturalLayer, type InfrastructureLayer, type SystemicLayer } from '@/contexts/LayerContext'
 import { ChevronDown, Leaf, Blocks, Radio } from 'lucide-react'
+import TimeWindowSelector from '@/components/TimeWindowSelector'
 
 interface LayerConfig {
   id: Layer
@@ -354,6 +355,17 @@ export default function LayerControls() {
           LIVE
         </span>
       </div>
+
+      {/* Divider */}
+      <div style={{
+        width: '1px',
+        height: '16px',
+        backgroundColor: '#242C3A',
+        margin: '0 8px'
+      }} />
+
+      {/* Time Window Selector */}
+      <TimeWindowSelector />
 
       <style jsx>{`
         @keyframes fadeIn {

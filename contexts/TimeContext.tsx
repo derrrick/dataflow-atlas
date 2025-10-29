@@ -13,9 +13,9 @@ interface TimeContextType {
 const TimeContext = createContext<TimeContextType | undefined>(undefined)
 
 export function TimeProvider({ children }: { children: ReactNode }) {
-  // Default: last 24 hours
+  // Default: last 7 days
   const [t1, setT1] = useState(() => Date.now())
-  const [windowMinutes, setWindowMinutes] = useState(1440) // 24 hours
+  const [windowMinutes, setWindowMinutes] = useState(10080) // 7 days (7 * 24 * 60)
 
   const t0 = t1 - windowMinutes * 60_000
 
