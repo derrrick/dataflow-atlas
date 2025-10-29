@@ -75,18 +75,36 @@ export async function fetchNASAFires(
     const events: UnifiedEvent[] = fires.map(fire => {
       const lat = parseFloat(fire.latitude as any)
       const lon = parseFloat(fire.longitude as any)
-      const brightness = parseFloat(fire.bright_ti4 as any)
+
+      // VIIRS uses 'bright_ti4', MODIS uses 'brightness'
+      const brightness = parseFloat((fire.bright_ti4 || (fire as any).brightness) as any)
       const frp = parseFloat(fire.frp as any)
 
       // Parse timestamp from date + time
       const dateTime = `${fire.acq_date}T${fire.acq_time.padStart(4, '0').slice(0, 2)}:${fire.acq_time.padStart(4, '0').slice(2)}:00Z`
       const timestamp = new Date(dateTime).getTime()
 
-      // Map confidence
+      // Map confidence - VIIRS uses letters (l/n/h), MODIS uses numbers (0-100)
       let confidence: 'high' | 'medium' | 'low'
-      if (fire.confidence === 'h') confidence = 'high'
-      else if (fire.confidence === 'n') confidence = 'medium'
-      else confidence = 'low'
+      const rawConfidence = fire.confidence
+
+      if (typeof fire.confidence === 'string') {
+        // VIIRS format: 'l', 'n', 'h'
+        if (fire.confidence === 'h') confidence = 'high'
+        else if (fire.confidence === 'n') confidence = 'medium'
+        else confidence = 'low'
+      } else {
+        // MODIS format: 0-100 numeric
+        const numConfidence = parseFloat(fire.confidence as any)
+        if (numConfidence >= 80) confidence = 'high'
+        else if (numConfidence >= 50) confidence = 'medium'
+        else confidence = 'low'
+      }
+
+      // Debug logging to track confidence values
+      if (fires.length > 0 && fires.indexOf(fire) < 3) {
+        console.log(`[FIRMS] Sample fire #${fires.indexOf(fire)} instrument="${fire.instrument}" confidence: raw="${rawConfidence}" mapped="${confidence}" brightness=${brightness}`)
+      }
 
       // Intensity based on FRP (Fire Radiative Power)
       // FRP typically ranges from 0-500 MW, scale to 0-10

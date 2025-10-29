@@ -61,7 +61,7 @@ export async function fetchWildfires(t0?: number, t1?: number, apiKey?: string):
     const wildfires: Wildfire[] = events
       .map(event => {
         const brightness = event.metadata?.brightness || 300 + event.primary_value * 10
-        const confidence = event.confidence === 'high' ? 90 : event.confidence === 'medium' ? 60 : 30
+        const confidence = event.confidence || 'unknown'
 
         return {
           id: event.id,

@@ -55,7 +55,7 @@ export interface Wildfire {
   id: string
   coords: [number, number]
   brightness: number // Fire radiative power in MW
-  confidence: number // Detection confidence (0-100)
+  confidence: string // Detection confidence from NASA FIRMS (low, medium, high)
   scan: number // Scan angle
   location: string
   time: string

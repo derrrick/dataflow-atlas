@@ -1,7 +1,7 @@
 'use client'
 
 interface MapPopupProps {
-  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage' | 'airQuality'
+  type: 'earthquake' | 'hazard' | 'outage' | 'latency' | 'powerOutage' | 'severeWeather' | 'internetOutage' | 'airQuality' | 'wildfire'
   data: {
     location?: string
     magnitude?: number
@@ -31,6 +31,9 @@ interface MapPopupProps {
     quality?: string
     parameter?: string
     category?: string
+    brightness?: number
+    confidence?: string
+    satellite?: string
   }
 }
 
@@ -43,6 +46,7 @@ const typeColors = {
   severeWeather: '#9333EA',
   internetOutage: '#4ECDC4',
   airQuality: '#A855F7',
+  wildfire: '#FF6B35',
 }
 
 const typeLabels = {
@@ -54,6 +58,7 @@ const typeLabels = {
   severeWeather: 'SEVERE WEATHER',
   internetOutage: 'INTERNET OUTAGE',
   airQuality: 'AIR QUALITY',
+  wildfire: 'WILDFIRE',
 }
 
 export default function MapPopup({ type, data }: MapPopupProps) {
@@ -82,6 +87,9 @@ export default function MapPopup({ type, data }: MapPopupProps) {
   } else if (type === 'airQuality' && data.aqi !== undefined) {
     primaryValue = data.aqi.toString()
     primaryLabel = 'AQI'
+  } else if (type === 'wildfire' && data.brightness) {
+    primaryValue = data.brightness.toString()
+    primaryLabel = 'BRIGHTNESS (K)'
   } else if (type === 'outage' && data.affected) {
     primaryValue = data.affected.toLocaleString()
     primaryLabel = 'AFFECTED'
@@ -426,6 +434,44 @@ export default function MapPopup({ type, data }: MapPopupProps) {
             </div>
           ` : ''}
         ` : ''}
+
+        ${type === 'wildfire' ? `
+          ${data.confidence ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">CONFIDENCE</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+                text-transform: capitalize;
+              ">${data.confidence}</div>
+            </div>
+          ` : ''}
+          ${data.satellite ? `
+            <div style="margin-bottom: 16px;">
+              <div style="
+                font-size: 10px;
+                color: #5E6A81;
+                font-family: Geist Mono, monospace;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+              ">SATELLITE</div>
+              <div style="
+                font-size: 14px;
+                color: #FFFFFF;
+                font-family: Albert Sans, sans-serif;
+              ">${data.satellite}</div>
+            </div>
+          ` : ''}
+        ` : ''}
       </div>
 
       <!-- Footer -->
@@ -435,12 +481,15 @@ export default function MapPopup({ type, data }: MapPopupProps) {
         background-color: #0A0F16;
       ">
         ${data.location ? `
-          <div style="
-            font-size: 12px;
-            color: #8F9BB0;
-            font-family: Albert Sans, sans-serif;
-            margin-bottom: ${data.time ? '8px' : '0'};
-          ">${data.location}</div>
+          ${data.location.split('\n').map((line, i) => `
+            <div style="
+              font-size: ${i === 0 ? '13px' : '11px'};
+              color: ${i === 0 ? '#FFFFFF' : '#8F9BB0'};
+              font-family: ${i === 0 ? 'Albert Sans, sans-serif' : 'Geist Mono, monospace'};
+              margin-bottom: ${i === data.location.split('\n').length - 1 ? (data.time ? '8px' : '0') : '4px'};
+              font-weight: ${i === 0 ? '500' : '400'};
+            ">${line}</div>
+          `).join('')}
         ` : ''}
         ${data.time ? `
           <div style="
