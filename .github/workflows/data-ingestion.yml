@@ -1,0 +1,33 @@
+name: Data Ingestion Cron
+
+on:
+  schedule:
+    # Runs every hour at minute 0
+    - cron: '0 * * * *'
+
+  # Allows manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger data ingestion
+        run: |
+          echo "🔄 Triggering data ingestion..."
+          response=$(curl -s -w "\n%{http_code}" \
+            https://dataflow-atlas-kp25gvhae-derricks-projects-7b5c3a91.vercel.app/api/cron/ingest)
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "📊 Response (HTTP $http_code):"
+          echo "$body" | jq -r '.' || echo "$body"
+
+          if [ "$http_code" -ne 200 ]; then
+            echo "❌ Failed with status $http_code"
+            exit 1
+          fi
+
+          echo "✅ Data ingestion completed successfully"
