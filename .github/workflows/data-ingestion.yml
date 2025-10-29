@@ -18,6 +18,7 @@ jobs:
 
           response=$(curl -s -w "\n%{http_code}" \
             -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.DEPLOYMENT_URL }}/api/cron/ingest/firms-daily")
 
           http_code=$(echo "$response" | tail -n1)
