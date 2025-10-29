@@ -1,0 +1,40 @@
+name: Daily Data Ingestion
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC (1 AM EST / 10 PM PST)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  ingest-firms:
+    name: Ingest NASA FIRMS Wildfire Data
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger FIRMS Ingestion
+        run: |
+          echo "🔥 Starting FIRMS wildfire data ingestion..."
+
+          response=$(curl -s -w "\n%{http_code}" \
+            -X GET \
+            "${{ secrets.DEPLOYMENT_URL }}/api/cron/ingest/firms-daily")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "Response: $body"
+          echo "HTTP Status: $http_code"
+
+          if [ "$http_code" -ne 200 ]; then
+            echo "❌ FIRMS ingestion failed with status $http_code"
+            exit 1
+          fi
+
+          echo "✅ FIRMS ingestion completed successfully"
+
+      - name: Check Ingestion Results
+        if: success()
+        run: |
+          echo "📊 Ingestion job completed"
+          echo "Next run: $(date -u -d '+1 day' '+%Y-%m-%d %H:%M UTC')"
